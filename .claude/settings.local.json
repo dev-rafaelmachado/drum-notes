@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cd '\\\\\\\\wsl.localhost\\\\ubuntu\\\\home\\\\rafael\\\\pes\\\\code\\\\drum-notes'; find docs -type f | sort; echo '---DIRS---'; find docs -type d | sort)"
+    ]
+  }
+}
