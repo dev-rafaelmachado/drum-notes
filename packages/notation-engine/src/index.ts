@@ -46,6 +46,9 @@ export { attachAudio, detachAudio } from "./operations/audio";
 // Validation
 export { stepsPerMeasure, stepsPerBeat, isValidPosition } from "./validation/position";
 
+// Playback preparation
+export { beatsPerMeasure, secondsPerBeat, isAccentBeat } from "./playback/metronome";
+
 // Export preparation
 export type { ScoreLayout, LayoutMeasure, LayoutRow } from "./export/score-layout";
 export { buildScoreLayout } from "./export/score-layout";
