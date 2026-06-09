@@ -2,9 +2,10 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { buildScoreLayout } from "@drum-notes/notation-engine";
+import { buildScoreLayout, type Instrument } from "@drum-notes/notation-engine";
 
 import { AudioPanel } from "@/features/audio/components/AudioPanel";
+import { instrumentPlayer } from "@/features/instrument-audio/services/instrument-player";
 import { useSyncStore } from "@/features/sync/stores/sync-store";
 import { useEditorStore } from "../stores/editor-store";
 import { EditorToolbar } from "./EditorToolbar";
@@ -22,6 +23,15 @@ export function ScoreEditor({ scoreId }: { scoreId: string }): React.JSX.Element
   const duplicateMeasure = useEditorStore((state) => state.duplicateMeasure);
   const toggleNote = useEditorStore((state) => state.toggleNote);
   const hydrateSync = useSyncStore((state) => state.hydrate);
+
+  const handleToggle = React.useCallback(
+    (measureId: string, instrument: Instrument, position: number) => {
+      toggleNote(measureId, instrument, position);
+      // Instant, fire-and-forget audio feedback (AUDIO-004) — never blocks the edit.
+      instrumentPlayer.play(instrument);
+    },
+    [toggleNote],
+  );
 
   React.useEffect(() => {
     // Load only when the open score differs from the requested one.
@@ -76,7 +86,7 @@ export function ScoreEditor({ scoreId }: { scoreId: string }): React.JSX.Element
             stepsPerBeat={layout.stepsPerBeat}
             canRemove={layout.measures.length > 1}
             orderedMeasureIds={orderedMeasureIds}
-            onToggle={toggleNote}
+            onToggle={handleToggle}
             onDuplicate={duplicateMeasure}
             onRemove={removeMeasure}
           />
