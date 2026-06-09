@@ -1,5 +1,6 @@
-import { openDB, type IDBPDatabase } from "idb";
 import type { Score } from "@drum-notes/notation-engine";
+
+import { AUDIO_STORE, getDb, SCORES_STORE } from "@/shared/lib/database";
 
 /**
  * Local-first persistence for scores, backed by IndexedDB (see
@@ -7,10 +8,6 @@ import type { Score } from "@drum-notes/notation-engine";
  * is the serialised domain Score plus a timestamp for ordering — storage
  * consumes the model, it does not define an alternative shape.
  */
-
-const DB_NAME = "drum-notes";
-const DB_VERSION = 1;
-const STORE = "scores";
 
 type StoredScore = Score & { readonly updatedAt: number };
 
@@ -23,34 +20,15 @@ export type ScoreSummary = {
   readonly updatedAt: number;
 };
 
-let dbPromise: Promise<IDBPDatabase> | null = null;
-
-function getDb(): Promise<IDBPDatabase> {
-  if (typeof indexedDB === "undefined") {
-    return Promise.reject(new Error("IndexedDB is not available in this environment."));
-  }
-  if (!dbPromise) {
-    dbPromise = openDB(DB_NAME, DB_VERSION, {
-      upgrade(db) {
-        if (!db.objectStoreNames.contains(STORE)) {
-          const store = db.createObjectStore(STORE, { keyPath: "id" });
-          store.createIndex("updatedAt", "updatedAt");
-        }
-      },
-    });
-  }
-  return dbPromise;
-}
-
 export async function saveScore(score: Score): Promise<void> {
   const db = await getDb();
   const record: StoredScore = { ...score, updatedAt: Date.now() };
-  await db.put(STORE, record);
+  await db.put(SCORES_STORE, record);
 }
 
 export async function loadScore(id: string): Promise<Score | null> {
   const db = await getDb();
-  const record = (await db.get(STORE, id)) as StoredScore | undefined;
+  const record = (await db.get(SCORES_STORE, id)) as StoredScore | undefined;
   if (!record) {
     return null;
   }
@@ -60,7 +38,7 @@ export async function loadScore(id: string): Promise<Score | null> {
 
 export async function listScores(): Promise<ScoreSummary[]> {
   const db = await getDb();
-  const records = (await db.getAll(STORE)) as StoredScore[];
+  const records = (await db.getAll(SCORES_STORE)) as StoredScore[];
   return records
     .sort((a, b) => b.updatedAt - a.updatedAt)
     .map((record) => ({
@@ -74,5 +52,11 @@ export async function listScores(): Promise<ScoreSummary[]> {
 
 export async function deleteScore(id: string): Promise<void> {
   const db = await getDb();
-  await db.delete(STORE, id);
+  // Remove the associated audio blob first so deleting a project leaves no
+  // orphaned audio behind (see docs/adr/006-audio-storage.md).
+  const record = (await db.get(SCORES_STORE, id)) as StoredScore | undefined;
+  if (record?.audio) {
+    await db.delete(AUDIO_STORE, record.audio.id);
+  }
+  await db.delete(SCORES_STORE, id);
 }
