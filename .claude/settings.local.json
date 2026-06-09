@@ -9,7 +9,8 @@
       "Bash(pnpm lint *)",
       "Bash(pnpm --filter @drum-notes/web build)",
       "Bash(pnpm test *)",
-      "Bash(pnpm --filter @drum-notes/notation-engine test)"
+      "Bash(pnpm --filter @drum-notes/notation-engine test)",
+      "Bash(node -e \"const l=require\\('lucide-react'\\); console.log\\(['PlayCircle','CirclePlay','StepForward','FastForward'].map\\(n=>n+':'+\\(n in l\\)\\).join\\(' '\\)\\)\")"
     ]
   }
 }
