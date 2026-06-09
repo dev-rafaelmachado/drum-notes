@@ -74,7 +74,7 @@ High
 
 ## AUDIO-003 - Score Synchronization
 
-Status: Backlog
+Status: Specified — see [score-sync spec](../specs/score-sync/spec.md)
 
 Description:
 Synchronize score measures with audio playback.

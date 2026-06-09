@@ -20,11 +20,15 @@ score representation.
 | **4** | **Mobile** | Capture and review grooves away from the desk. | Responsive/native shell; touch-first editing. | Platform-specific app code only; domain stays platform-independent. |
 | **5** | **Community Score Sharing** | Publish and discover scores. | Accounts; cloud sync; public score library. | Supabase backend + sync ADR; auth ADR. |
 
-> **Note:** Audio **upload and playback** ([AUDIO-001](../specs/audio-upload/spec.md))
-> is being brought forward ahead of Phase 2; its loading/format and playback
-> decisions are recorded in [ADR-005](../adr/005-audio-playback.md) and
-> [ADR-006](../adr/006-audio-storage.md). Score ↔ audio **synchronization**
-> (current-measure indicator, auto-scroll, playhead) remains Phase 2 (AUDIO-003).
+> **Note:** Audio is being brought forward ahead of Phase 2. Upload and playback
+> ([AUDIO-001](../specs/audio-upload/spec.md)) are recorded in
+> [ADR-005](../adr/005-audio-playback.md) / [ADR-006](../adr/006-audio-storage.md);
+> the project metronome ([AUDIO-002](../specs/metronome/spec.md)) in
+> [ADR-007](../adr/007-metronome.md); and score ↔ audio **synchronization**
+> (current-measure indicator, auto-scroll, seek both ways,
+> [AUDIO-003](../specs/score-sync/spec.md)) in [ADR-008](../adr/008-score-sync.md).
+> Their **automatic** counterparts (BPM/measure/beat detection, AI sync) remain
+> Phase 3.
 
 ---
 
