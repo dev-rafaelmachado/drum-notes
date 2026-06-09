@@ -1,7 +1,14 @@
 {
   "permissions": {
     "allow": [
-      "Bash(cd '\\\\\\\\wsl.localhost\\\\ubuntu\\\\home\\\\rafael\\\\pes\\\\code\\\\drum-notes'; find docs -type f | sort; echo '---DIRS---'; find docs -type d | sort)"
+      "Bash(cd '\\\\\\\\wsl.localhost\\\\ubuntu\\\\home\\\\rafael\\\\pes\\\\code\\\\drum-notes'; find docs -type f | sort; echo '---DIRS---'; find docs -type d | sort)",
+      "Bash(pnpm --filter @drum-notes/web add tone)",
+      "Bash(pnpm --filter @drum-notes/web test)",
+      "Bash(pnpm --filter @drum-notes/notation-engine type-check)",
+      "Bash(pnpm --filter @drum-notes/web type-check)",
+      "Bash(pnpm lint *)",
+      "Bash(pnpm --filter @drum-notes/web build)",
+      "Bash(pnpm test *)"
     ]
   }
 }
