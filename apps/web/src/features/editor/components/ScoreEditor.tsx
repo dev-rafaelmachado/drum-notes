@@ -5,9 +5,10 @@ import Link from "next/link";
 import { buildScoreLayout } from "@drum-notes/notation-engine";
 
 import { AudioPanel } from "@/features/audio/components/AudioPanel";
+import { useSyncStore } from "@/features/sync/stores/sync-store";
 import { useEditorStore } from "../stores/editor-store";
 import { EditorToolbar } from "./EditorToolbar";
-import { MeasureView } from "./MeasureView";
+import { EditorMeasure } from "./EditorMeasure";
 
 export function ScoreEditor({ scoreId }: { scoreId: string }): React.JSX.Element {
   const score = useEditorStore((state) => state.score);
@@ -20,6 +21,7 @@ export function ScoreEditor({ scoreId }: { scoreId: string }): React.JSX.Element
   const removeMeasure = useEditorStore((state) => state.removeMeasure);
   const duplicateMeasure = useEditorStore((state) => state.duplicateMeasure);
   const toggleNote = useEditorStore((state) => state.toggleNote);
+  const hydrateSync = useSyncStore((state) => state.hydrate);
 
   React.useEffect(() => {
     // Load only when the open score differs from the requested one.
@@ -27,6 +29,11 @@ export function ScoreEditor({ scoreId }: { scoreId: string }): React.JSX.Element
       void loadScore(scoreId);
     }
   }, [scoreId, score, loadScore]);
+
+  React.useEffect(() => {
+    // Hydrate the score's synchronization map alongside the score.
+    void hydrateSync(scoreId);
+  }, [scoreId, hydrateSync]);
 
   if (loadStatus === "loading" || loadStatus === "idle") {
     return <CenteredMessage>Loading score…</CenteredMessage>;
@@ -48,6 +55,7 @@ export function ScoreEditor({ scoreId }: { scoreId: string }): React.JSX.Element
   }
 
   const layout = buildScoreLayout(score);
+  const orderedMeasureIds = layout.measures.map((measure) => measure.id);
 
   return (
     <div className="min-h-screen bg-neutral-50">
@@ -61,12 +69,13 @@ export function ScoreEditor({ scoreId }: { scoreId: string }): React.JSX.Element
       <main className="mx-auto max-w-5xl space-y-4 px-6 py-6">
         <AudioPanel audio={score.audio ?? null} />
         {layout.measures.map((measure, index) => (
-          <MeasureView
+          <EditorMeasure
             key={measure.id}
             measure={measure}
             index={index}
             stepsPerBeat={layout.stepsPerBeat}
             canRemove={layout.measures.length > 1}
+            orderedMeasureIds={orderedMeasureIds}
             onToggle={toggleNote}
             onDuplicate={duplicateMeasure}
             onRemove={removeMeasure}
