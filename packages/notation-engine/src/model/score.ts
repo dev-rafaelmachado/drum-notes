@@ -1,3 +1,4 @@
+import type { AudioReference } from "./audio";
 import type { Measure } from "./measure";
 import type { Subdivision } from "./subdivision";
 import type { TimeSignature } from "./time-signature";
@@ -13,4 +14,9 @@ export type Score = {
   readonly timeSignature: TimeSignature;
   readonly subdivision: Subdivision;
   readonly measures: readonly Measure[];
+  /**
+   * Optional reference recording attached to the project. Metadata only — the
+   * audio bytes live in storage (see docs/adr/006-audio-storage.md).
+   */
+  readonly audio?: AudioReference;
 };

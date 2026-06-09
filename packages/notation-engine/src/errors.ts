@@ -26,3 +26,11 @@ export class InvalidBpmError extends Error {
     this.name = "InvalidBpmError";
   }
 }
+
+/** An audio file with an unsupported MIME type was supplied. */
+export class UnsupportedAudioTypeError extends Error {
+  constructor(readonly mimeType: string) {
+    super(`Audio type "${mimeType}" is not supported (expected MP3 or WAV).`);
+    this.name = "UnsupportedAudioTypeError";
+  }
+}

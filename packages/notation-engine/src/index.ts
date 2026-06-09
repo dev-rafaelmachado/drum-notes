@@ -28,6 +28,12 @@ export { DEFAULT_VELOCITY, createNote } from "./model/note";
 export type { Measure } from "./model/measure";
 export { createMeasure } from "./model/measure";
 export type { Score } from "./model/score";
+export type { AudioReference, CreateAudioReferenceInput } from "./model/audio";
+export {
+  SUPPORTED_AUDIO_MIME_TYPES,
+  isSupportedAudioMimeType,
+  createAudioReference,
+} from "./model/audio";
 
 // Operations
 export type { CreateScoreInput } from "./operations/create-score";
@@ -35,6 +41,7 @@ export { createScore } from "./operations/create-score";
 export { setTitle, setBpm } from "./operations/score-settings";
 export { addMeasure, removeMeasure, duplicateMeasure } from "./operations/measures";
 export { toggleNote, hasNote } from "./operations/notes";
+export { attachAudio, detachAudio } from "./operations/audio";
 
 // Validation
 export { stepsPerMeasure, stepsPerBeat, isValidPosition } from "./validation/position";
@@ -44,4 +51,9 @@ export type { ScoreLayout, LayoutMeasure, LayoutRow } from "./export/score-layou
 export { buildScoreLayout } from "./export/score-layout";
 
 // Errors
-export { InvalidPositionError, MeasureNotFoundError, InvalidBpmError } from "./errors";
+export {
+  InvalidPositionError,
+  MeasureNotFoundError,
+  InvalidBpmError,
+  UnsupportedAudioTypeError,
+} from "./errors";
