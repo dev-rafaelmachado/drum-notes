@@ -93,33 +93,7 @@ High
 
 ---
 
-## AUDIO-004 - Score Playback
-
-Status: Backlog
-
-Description:
-Play the written drum notation using drum samples. Reuses the instrument-audio
-engine introduced by Instant Audio Feedback (below).
-
-Features:
-
-* Play
-* Pause
-* Stop
-* BPM synchronization
-
-Value:
-Users can validate transcriptions before practicing.
-
-Priority:
-High
-
----
-
 ## AUDIO-004 - Instant Audio Feedback (SKI-10)
-
-> Note: Linear reuses the AUDIO-004 code for this issue; it is a distinct feature
-> from *Score Playback* above and shares the instrument-audio engine with it.
 
 Status: Specified — see [instant-feedback spec](../specs/instant-feedback/spec.md)
 
@@ -136,6 +110,33 @@ Features:
 
 Value:
 Confirms by ear that notes land on the right instrument, speeding up editing.
+
+Priority:
+High
+
+---
+
+## AUDIO-005 - Score Playback (SKI-11)
+
+Status: Specified — see [score-playback spec](../specs/score-playback/spec.md)
+
+Description:
+Play the written drum notation back with drum sounds — start / pause / resume /
+stop, follow the project BPM, highlight measures and notes as they play, and
+begin from any measure. Reuses the instrument-audio engine from AUDIO-004 and is
+generated directly from the Score → Measure → Note model. Realises roadmap
+Phase 1 (Playback).
+
+Features:
+
+* Play / Pause / Resume / Stop
+* BPM synchronization
+* Correct drum sound per instrument
+* Active-measure and note highlighting during playback
+* Playback from a selected measure
+
+Value:
+Users can validate transcriptions by ear before practicing.
 
 Priority:
 High

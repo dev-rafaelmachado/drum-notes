@@ -29,8 +29,11 @@ score representation.
 > [AUDIO-003](../specs/score-sync/spec.md)) in [ADR-008](../adr/008-score-sync.md).
 > Instant audio feedback ([AUDIO-004 / SKI-10](../specs/instant-feedback/spec.md),
 > [ADR-009](../adr/009-instrument-audio.md)) adds a reusable per-instrument sound
-> engine that **Phase 1 Score Playback** will reuse. Their **automatic**
-> counterparts (BPM/measure/beat detection, AI sync) remain Phase 3.
+> engine, and **Phase 1 — Playback** is realised by score playback
+> ([AUDIO-005 / SKI-11](../specs/score-playback/spec.md),
+> [ADR-010](../adr/010-score-playback.md)), which reuses that engine and derives
+> timing from the domain model. Their **automatic** counterparts
+> (BPM/measure/beat detection, AI sync) remain Phase 3.
 
 ---
 
