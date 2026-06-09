@@ -1,6 +1,6 @@
 import type { Score } from "@drum-notes/notation-engine";
 
-import { AUDIO_STORE, getDb, SCORES_STORE } from "@/shared/lib/database";
+import { AUDIO_STORE, getDb, SCORES_STORE, SYNC_STORE } from "@/shared/lib/database";
 
 /**
  * Local-first persistence for scores, backed by IndexedDB (see
@@ -52,11 +52,12 @@ export async function listScores(): Promise<ScoreSummary[]> {
 
 export async function deleteScore(id: string): Promise<void> {
   const db = await getDb();
-  // Remove the associated audio blob first so deleting a project leaves no
-  // orphaned audio behind (see docs/adr/006-audio-storage.md).
+  // Remove associated data first so deleting a project leaves no orphans: the
+  // audio blob (ADR-006) and the sync map (ADR-008).
   const record = (await db.get(SCORES_STORE, id)) as StoredScore | undefined;
   if (record?.audio) {
     await db.delete(AUDIO_STORE, record.audio.id);
   }
+  await db.delete(SYNC_STORE, id);
   await db.delete(SCORES_STORE, id);
 }
