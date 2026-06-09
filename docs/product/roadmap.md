@@ -27,8 +27,10 @@ score representation.
 > [ADR-007](../adr/007-metronome.md); and score ↔ audio **synchronization**
 > (current-measure indicator, auto-scroll, seek both ways,
 > [AUDIO-003](../specs/score-sync/spec.md)) in [ADR-008](../adr/008-score-sync.md).
-> Their **automatic** counterparts (BPM/measure/beat detection, AI sync) remain
-> Phase 3.
+> Instant audio feedback ([AUDIO-004 / SKI-10](../specs/instant-feedback/spec.md),
+> [ADR-009](../adr/009-instrument-audio.md)) adds a reusable per-instrument sound
+> engine that **Phase 1 Score Playback** will reuse. Their **automatic**
+> counterparts (BPM/measure/beat detection, AI sync) remain Phase 3.
 
 ---
 

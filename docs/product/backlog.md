@@ -98,7 +98,8 @@ High
 Status: Backlog
 
 Description:
-Play the written drum notation using drum samples.
+Play the written drum notation using drum samples. Reuses the instrument-audio
+engine introduced by Instant Audio Feedback (below).
 
 Features:
 
@@ -109,6 +110,32 @@ Features:
 
 Value:
 Users can validate transcriptions before practicing.
+
+Priority:
+High
+
+---
+
+## AUDIO-004 - Instant Audio Feedback (SKI-10)
+
+> Note: Linear reuses the AUDIO-004 code for this issue; it is a distinct feature
+> from *Score Playback* above and shares the instrument-audio engine with it.
+
+Status: Specified — see [instant-feedback spec](../specs/instant-feedback/spec.md)
+
+Description:
+Play the corresponding drum sound the moment a note is added or clicked, for
+instant validation while writing notation.
+
+Features:
+
+* Sound on adding a note
+* Sound on clicking an existing note
+* All eight instruments
+* Reusable `play(instrument)` engine
+
+Value:
+Confirms by ear that notes land on the right instrument, speeding up editing.
 
 Priority:
 High
