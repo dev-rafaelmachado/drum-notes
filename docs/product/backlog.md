@@ -25,7 +25,7 @@ High
 
 ## AUDIO-001 - Audio Upload
 
-Status: Backlog
+Status: Specified — see [audio-upload spec](../specs/audio-upload/spec.md)
 
 Description:
 Allow users to upload audio files to the project.

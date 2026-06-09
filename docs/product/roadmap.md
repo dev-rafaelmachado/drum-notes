@@ -20,6 +20,12 @@ score representation.
 | **4** | **Mobile** | Capture and review grooves away from the desk. | Responsive/native shell; touch-first editing. | Platform-specific app code only; domain stays platform-independent. |
 | **5** | **Community Score Sharing** | Publish and discover scores. | Accounts; cloud sync; public score library. | Supabase backend + sync ADR; auth ADR. |
 
+> **Note:** Audio **upload and playback** ([AUDIO-001](../specs/audio-upload/spec.md))
+> is being brought forward ahead of Phase 2; its loading/format and playback
+> decisions are recorded in [ADR-005](../adr/005-audio-playback.md) and
+> [ADR-006](../adr/006-audio-storage.md). Score ↔ audio **synchronization**
+> (current-measure indicator, auto-scroll, playhead) remains Phase 2 (AUDIO-003).
+
 ---
 
 ## Sequencing Principles
