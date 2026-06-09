@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { ExportButtons } from "@/features/export/components/ExportButtons";
+import { MetronomePanel } from "@/features/metronome/components/MetronomePanel";
 import type { SaveStatus } from "../stores/editor-store";
 
 const SAVE_LABELS: Record<SaveStatus, string> = {
@@ -77,6 +78,8 @@ export function EditorToolbar({
         <span className="text-sm text-neutral-500">
           {formatTimeSignature(score.timeSignature)} · {SUBDIVISION_LABELS[score.subdivision]}
         </span>
+
+        <MetronomePanel bpm={score.bpm} timeSignature={score.timeSignature} />
 
         <div className="ml-auto flex items-center gap-3">
           <span className="text-xs text-neutral-400">{SAVE_LABELS[saveStatus]}</span>
