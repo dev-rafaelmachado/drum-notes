@@ -2,7 +2,7 @@
 
 import * as React from "react";
 
-import { formatTime } from "../lib/format-time";
+import { formatTime } from "@/shared/lib/format-time";
 
 type PositionDisplayProps = {
   readonly position: number;
