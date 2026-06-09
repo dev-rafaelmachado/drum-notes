@@ -4,6 +4,7 @@ import * as React from "react";
 import Link from "next/link";
 import { buildScoreLayout } from "@drum-notes/notation-engine";
 
+import { AudioPanel } from "@/features/audio/components/AudioPanel";
 import { useEditorStore } from "../stores/editor-store";
 import { EditorToolbar } from "./EditorToolbar";
 import { MeasureView } from "./MeasureView";
@@ -58,6 +59,7 @@ export function ScoreEditor({ scoreId }: { scoreId: string }): React.JSX.Element
         onAddMeasure={addMeasure}
       />
       <main className="mx-auto max-w-5xl space-y-4 px-6 py-6">
+        <AudioPanel audio={score.audio ?? null} />
         {layout.measures.map((measure, index) => (
           <MeasureView
             key={measure.id}

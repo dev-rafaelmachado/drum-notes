@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import * as engine from "@drum-notes/notation-engine";
-import type { Instrument, Score } from "@drum-notes/notation-engine";
+import type { AudioReference, Instrument, Score } from "@drum-notes/notation-engine";
 
 import { loadScore as loadScoreFromDb, saveScore } from "../../project/services/score-repository";
 
@@ -28,6 +28,8 @@ type EditorState = {
   removeMeasure: (measureId: string) => void;
   duplicateMeasure: (measureId: string) => void;
   toggleNote: (measureId: string, instrument: Instrument, position: number) => void;
+  attachAudio: (audio: AudioReference) => void;
+  detachAudio: () => void;
 };
 
 export const useEditorStore = create<EditorState>((set, get) => {
@@ -87,5 +89,7 @@ export const useEditorStore = create<EditorState>((set, get) => {
       edit((score) => engine.duplicateMeasure(score, measureId)),
     toggleNote: (measureId, instrument, position) =>
       edit((score) => engine.toggleNote(score, measureId, instrument, position)),
+    attachAudio: (audio) => edit((score) => engine.attachAudio(score, audio)),
+    detachAudio: () => edit((score) => engine.detachAudio(score)),
   };
 });
