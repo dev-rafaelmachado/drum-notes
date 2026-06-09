@@ -35,6 +35,21 @@ The top-level document.
 | `timeSignature` | Meter (e.g. `4/4`). |
 | `subdivision` | Rhythmic grid resolution (e.g. 8th, 16th). Defines valid note positions. |
 | `measures` | Ordered list of Measures. |
+| `audio` | *Optional.* Reference to an attached recording (metadata only — see AudioReference). |
+
+### AudioReference
+
+An optional pointer from a Score to an uploaded reference track. It holds **only
+metadata** — never the audio bytes — so the domain stays Browser-API-agnostic.
+The blob lives in storage, keyed by `id` (see [storage.md](storage.md) and
+[ADR-006](../adr/006-audio-storage.md)).
+
+| Field | Description |
+|-------|-------------|
+| `id` | Identifier; the key of the audio blob in the `audio` store. |
+| `fileName` | Original file name. |
+| `mimeType` | Audio MIME type (MP3 / WAV). |
+| `duration` | Track length in seconds. |
 
 ### Measure
 

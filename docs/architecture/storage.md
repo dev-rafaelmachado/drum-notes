@@ -9,16 +9,24 @@ Measure / Note, it does not define its own shape.
 
 ---
 
-## Object Store
+## Object Stores
 
-A single database holds the user's scores.
+The database holds the user's scores and any audio they upload.
 
 | Store | Key | Value |
 |-------|-----|-------|
-| `scores` | `score.id` | The serialised Score (title, bpm, timeSignature, subdivision, measures → notes). |
+| `scores` | `score.id` | The serialised Score (title, bpm, timeSignature, subdivision, measures → notes, optional audio reference). |
+| `audio` | `audioReference.id` | The uploaded audio **blob** plus its mime type (see [ADR-006](../adr/006-audio-storage.md)). |
 
-The serialised value is a direct projection of the domain Score. There is no
+The `scores` value is a direct projection of the domain Score. There is no
 secondary representation; loading reconstitutes the same model the editor uses.
+
+The `audio` store holds the binary that the domain deliberately does **not**
+carry: the Score keeps only an `AudioReference` (id, fileName, mimeType,
+duration), and the bytes live here keyed by that reference `id`. The `audio`
+store was added in DB version 2 as an additive upgrade (`scores` unchanged).
+Deleting a score deletes its associated blob; replacing a score's audio deletes
+the previous blob.
 
 ---
 
@@ -32,6 +40,7 @@ written on every meaningful change:
 * on **removing a note**
 * on **changing BPM**
 * on **changing a measure** (add / remove / duplicate)
+* on **attaching / detaching audio** (the Score's audio reference)
 
 This guarantees the on-disk state always matches the editor state, satisfying
 the "reopen a saved project unchanged" success criterion.
