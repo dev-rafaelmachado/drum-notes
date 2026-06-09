@@ -11,12 +11,14 @@ Measure / Note, it does not define its own shape.
 
 ## Object Stores
 
-The database holds the user's scores and any audio they upload.
+The database holds the user's scores, any audio they upload, and the
+score-to-audio synchronization map.
 
 | Store | Key | Value |
 |-------|-----|-------|
 | `scores` | `score.id` | The serialised Score (title, bpm, timeSignature, subdivision, measures → notes, optional audio reference). |
 | `audio` | `audioReference.id` | The uploaded audio **blob** plus its mime type (see [ADR-006](../adr/006-audio-storage.md)). |
+| `sync` | `scoreId` | The `SyncMap` of `{ measureId, start, end }` entries, stored **separately from notation** (see [ADR-008](../adr/008-score-sync.md)). |
 
 The `scores` value is a direct projection of the domain Score. There is no
 secondary representation; loading reconstitutes the same model the editor uses.
@@ -27,6 +29,11 @@ duration), and the bytes live here keyed by that reference `id`. The `audio`
 store was added in DB version 2 as an additive upgrade (`scores` unchanged).
 Deleting a score deletes its associated blob; replacing a score's audio deletes
 the previous blob.
+
+The `sync` store holds the synchronization map keyed by `scoreId`, kept apart
+from the notation it references so the two evolve independently. It was added in
+DB version 3 as an additive upgrade (`scores` and `audio` unchanged). Deleting a
+score deletes its sync map.
 
 ---
 

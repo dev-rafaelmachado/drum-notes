@@ -116,3 +116,17 @@ Prefer **extending** existing entities over creating new ones. Before adding a
 concept, verify it cannot be expressed by Score / Measure / Note / Instrument.
 Any structural change to the model requires updating this document and recording
 an ADR.
+
+---
+
+## Related Non-Notation Structures
+
+Some concepts reference the notation without being part of it. They live in their
+own modules and stores, keyed by ids, and **must not** alter Score / Measure /
+Note — they are not alternative score representations.
+
+* **SyncMap** (playback preparation) — maps measures to audio timestamps
+  (`{ measureId, start, end }`) for score synchronization. It references measure
+  **ids** only and is stored separately from notation (see
+  [score-sync spec](../specs/score-sync/spec.md) and
+  [ADR-008](../adr/008-score-sync.md)).
