@@ -49,6 +49,17 @@ export { stepsPerMeasure, stepsPerBeat, isValidPosition } from "./validation/pos
 // Playback preparation
 export { beatsPerMeasure, secondsPerBeat, isAccentBeat } from "./playback/metronome";
 
+// Synchronization (stored separately from notation — see docs/adr/008-score-sync.md)
+export type { MeasureTimestamp, SyncMap } from "./sync/sync-map";
+export {
+  createSyncMap,
+  setMeasureTimestamp,
+  removeMeasureTimestamp,
+  hasMeasureTimestamp,
+  activeMeasureAt,
+  measureStart,
+} from "./sync/sync-map";
+
 // Export preparation
 export type { ScoreLayout, LayoutMeasure, LayoutRow } from "./export/score-layout";
 export { buildScoreLayout } from "./export/score-layout";
@@ -59,4 +70,5 @@ export {
   MeasureNotFoundError,
   InvalidBpmError,
   UnsupportedAudioTypeError,
+  InvalidTimestampError,
 } from "./errors";

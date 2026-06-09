@@ -34,3 +34,17 @@ export class UnsupportedAudioTypeError extends Error {
     this.name = "UnsupportedAudioTypeError";
   }
 }
+
+/** A measure timestamp window was outside the valid range (0 <= start < end). */
+export class InvalidTimestampError extends Error {
+  constructor(
+    readonly measureId: string,
+    readonly start: number,
+    readonly end: number,
+  ) {
+    super(
+      `Invalid timestamp for measure "${measureId}": start ${start}, end ${end} (require 0 <= start < end).`,
+    );
+    this.name = "InvalidTimestampError";
+  }
+}
