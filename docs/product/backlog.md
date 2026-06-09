@@ -53,7 +53,7 @@ High
 
 ## AUDIO-002 - Project Metronome
 
-Status: Backlog
+Status: Specified — see [metronome spec](../specs/metronome/spec.md)
 
 Description:
 Provide a metronome synchronized with the project BPM.
