@@ -8,7 +8,8 @@
       "Bash(pnpm --filter @drum-notes/web type-check)",
       "Bash(pnpm lint *)",
       "Bash(pnpm --filter @drum-notes/web build)",
-      "Bash(pnpm test *)"
+      "Bash(pnpm test *)",
+      "Bash(pnpm --filter @drum-notes/notation-engine test)"
     ]
   }
 }
