@@ -17,6 +17,8 @@ vi.mock("../services/playback-engine", () => ({
     pause: vi.fn(),
     resume: vi.fn(),
     stop: vi.fn(),
+    setSpeed: vi.fn(),
+    setLoop: vi.fn(),
   },
 }));
 
@@ -31,7 +33,13 @@ const SCORE = { id: "s1", bpm: 120 } as unknown as Score;
 
 beforeEach(() => {
   vi.clearAllMocks();
-  usePlaybackStore.setState({ status: "idle", currentMeasureIndex: -1, currentStep: -1 });
+  usePlaybackStore.setState({
+    status: "idle",
+    currentMeasureIndex: -1,
+    currentStep: -1,
+    speed: 1,
+    loop: null,
+  });
 });
 
 describe("playback store", () => {
@@ -93,5 +101,70 @@ describe("playback store", () => {
     hoisted.registeredHandlers?.onEnded();
     expect(usePlaybackStore.getState().status).toBe("idle");
     expect(usePlaybackStore.getState().currentMeasureIndex).toBe(-1);
+  });
+
+  it("defaults to 1× speed and no loop", () => {
+    expect(usePlaybackStore.getState().speed).toBe(1);
+    expect(usePlaybackStore.getState().loop).toBeNull();
+  });
+
+  it("sets the speed and forwards it to the engine", () => {
+    usePlaybackStore.getState().setSpeed(0.5);
+
+    expect(usePlaybackStore.getState().speed).toBe(0.5);
+    expect(playbackEngine.setSpeed).toHaveBeenCalledWith(0.5);
+  });
+
+  it("starts a loop on the first selected measure", () => {
+    usePlaybackStore.getState().toggleLoopMeasure(2);
+
+    expect(usePlaybackStore.getState().loop).toEqual({ start: 2, end: 2 });
+    expect(playbackEngine.setLoop).toHaveBeenLastCalledWith({ start: 2, end: 2 });
+  });
+
+  it("extends the loop to a later measure", () => {
+    usePlaybackStore.setState({ loop: { start: 1, end: 1 } });
+    usePlaybackStore.getState().toggleLoopMeasure(3);
+
+    expect(usePlaybackStore.getState().loop).toEqual({ start: 1, end: 3 });
+  });
+
+  it("moves the loop start when selecting an earlier measure", () => {
+    usePlaybackStore.setState({ loop: { start: 2, end: 4 } });
+    usePlaybackStore.getState().toggleLoopMeasure(0);
+
+    expect(usePlaybackStore.getState().loop).toEqual({ start: 0, end: 4 });
+  });
+
+  it("clears the loop when toggling the lone looped measure", () => {
+    usePlaybackStore.setState({ loop: { start: 2, end: 2 } });
+    usePlaybackStore.getState().toggleLoopMeasure(2);
+
+    expect(usePlaybackStore.getState().loop).toBeNull();
+    expect(playbackEngine.setLoop).toHaveBeenLastCalledWith(null);
+  });
+
+  it("restarts the selection when toggling a measure inside the range", () => {
+    usePlaybackStore.setState({ loop: { start: 1, end: 4 } });
+    usePlaybackStore.getState().toggleLoopMeasure(2);
+
+    expect(usePlaybackStore.getState().loop).toEqual({ start: 2, end: 2 });
+  });
+
+  it("clears the loop and tells the engine", () => {
+    usePlaybackStore.setState({ loop: { start: 1, end: 3 } });
+    usePlaybackStore.getState().clearLoop();
+
+    expect(usePlaybackStore.getState().loop).toBeNull();
+    expect(playbackEngine.setLoop).toHaveBeenCalledWith(null);
+  });
+
+  it("re-applies the session loop and speed when starting playback", async () => {
+    usePlaybackStore.setState({ speed: 0.75, loop: { start: 1, end: 2 } });
+
+    await usePlaybackStore.getState().play(SCORE);
+
+    expect(playbackEngine.setSpeed).toHaveBeenCalledWith(0.75);
+    expect(playbackEngine.setLoop).toHaveBeenCalledWith({ start: 1, end: 2 });
   });
 });
