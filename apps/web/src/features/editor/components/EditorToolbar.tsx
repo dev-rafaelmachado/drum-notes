@@ -16,6 +16,7 @@ import { cn } from "@/lib/utils";
 import { ExportButtons } from "@/features/export/components/ExportButtons";
 import { MetronomePanel } from "@/features/metronome/components/MetronomePanel";
 import { ScorePlaybackControls } from "@/features/score-playback/components/ScorePlaybackControls";
+import { SyncProjectionControls } from "@/features/sync/components/SyncProjectionControls";
 import type { SaveStatus } from "../stores/editor-store";
 
 const SAVE_LABELS: Record<SaveStatus, string> = {
@@ -86,6 +87,7 @@ export function EditorToolbar({
 
         <div className="ml-auto flex items-center gap-3">
           <span className="text-xs text-neutral-400">{SAVE_LABELS[saveStatus]}</span>
+          <SyncProjectionControls score={score} />
           <Button variant="outline" size="sm" onClick={onAddMeasure}>
             <Plus className="h-4 w-4" />
             Measure
