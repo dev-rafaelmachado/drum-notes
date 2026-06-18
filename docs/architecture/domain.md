@@ -129,4 +129,9 @@ Note — they are not alternative score representations.
   (`{ measureId, start, end }`) for score synchronization. It references measure
   **ids** only and is stored separately from notation (see
   [score-sync spec](../specs/score-sync/spec.md) and
-  [ADR-008](../adr/008-score-sync.md)).
+  [ADR-008](../adr/008-score-sync.md)). Entries can be created manually or
+  **projected** from a single anchor measure using the project's tempo
+  (`beatsPerMeasure`, `secondsPerBeat`) — see
+  [measure-timestamp-projection spec](../specs/measure-timestamp-projection/spec.md).
+  Projected entries are ordinary `SyncMap` entries, indistinguishable from
+  manual ones.

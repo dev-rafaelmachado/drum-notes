@@ -140,3 +140,28 @@ Users can validate transcriptions by ear before practicing.
 
 Priority:
 High
+
+## AUDIO-006 - Measure Timestamp Projection
+
+Status: Specified — see [measure-timestamp-projection spec](../specs/measure-timestamp-projection/spec.md)
+
+Description:
+Sync a song to the score by defining one anchor measure's start timestamp and
+automatically projecting every forward measure from the project's BPM and time
+signature. Projected entries are stored as regular `SyncMap` entries (building on
+AUDIO-003) and behave identically to manual mappings — highlight, seek, scroll.
+The anchor persists for one-click regeneration. Realises roadmap Phase 2
+(Audio Synchronization).
+
+Features:
+
+* Anchor a measure at a manual or captured timestamp
+* Forward projection of all subsequent measures from the tempo
+* Manual override of any projected timestamp
+* Regenerate all projections from the stored anchor
+
+Value:
+Removes repetitive bar-by-bar mapping for songs recorded to a stable tempo.
+
+Priority:
+Medium

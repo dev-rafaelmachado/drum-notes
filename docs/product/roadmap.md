@@ -32,8 +32,11 @@ score representation.
 > engine, and **Phase 1 — Playback** is realised by score playback
 > ([AUDIO-005 / SKI-11](../specs/score-playback/spec.md),
 > [ADR-010](../adr/010-score-playback.md)), which reuses that engine and derives
-> timing from the domain model. Their **automatic** counterparts
-> (BPM/measure/beat detection, AI sync) remain Phase 3.
+> timing from the domain model. **Phase 2 — Audio Synchronization** is advanced
+> by measure timestamp projection ([AUDIO-006](../specs/measure-timestamp-projection/spec.md)),
+> which anchors one measure and projects the rest from the project's tempo,
+> reusing the SyncMap from [ADR-008](../adr/008-score-sync.md). Their **automatic**
+> counterparts (BPM/measure/beat detection, AI sync) remain Phase 3.
 
 ---
 
