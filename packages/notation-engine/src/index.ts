@@ -61,6 +61,7 @@ export {
   activeMeasureAt,
   measureStart,
 } from "./sync/sync-map";
+export { projectMeasureTimestamps } from "./sync/projection";
 
 // Export preparation
 export type { ScoreLayout, LayoutMeasure, LayoutRow } from "./export/score-layout";
