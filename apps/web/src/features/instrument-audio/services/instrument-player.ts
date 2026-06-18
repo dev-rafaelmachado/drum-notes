@@ -1,4 +1,4 @@
-import type { Instrument } from "@drum-notes/notation-engine";
+import { INSTRUMENTS, type Instrument } from "@drum-notes/notation-engine";
 import type { Filter, MembraneSynth, MetalSynth, NoiseSynth } from "tone";
 
 import { INSTRUMENT_VOICES, type VoiceConfig } from "./instrument-voices";
@@ -37,6 +37,36 @@ class InstrumentPlayer {
     void this.playSafely(instrument);
   }
 
+  /**
+   * Warm up the engine: resume the audio context and build every voice so the
+   * first scheduled note isn't delayed. Called before scheduled playback.
+   */
+  async prepare(): Promise<void> {
+    const tone = await this.ensureTone();
+    if (!this.started) {
+      await tone.start();
+      this.started = true;
+    }
+    for (const instrument of INSTRUMENTS) {
+      this.triggerFor(tone, instrument);
+    }
+  }
+
+  /**
+   * Sound an instrument at a precise audio-context `time`, for scheduled
+   * playback. Requires the engine to be prepared; a no-op otherwise. Safe.
+   */
+  trigger(instrument: Instrument, time: number): void {
+    if (!this.tone) {
+      return;
+    }
+    try {
+      this.triggerFor(this.tone, instrument)(time);
+    } catch {
+      // Never let a scheduling hiccup break playback.
+    }
+  }
+
   private async playSafely(instrument: Instrument): Promise<void> {
     try {
       const tone = await this.ensureTone();
@@ -44,15 +74,19 @@ class InstrumentPlayer {
         await tone.start(); // resume the audio context on the user gesture
         this.started = true;
       }
-      let trigger = this.triggers.get(instrument);
-      if (!trigger) {
-        trigger = this.buildTrigger(tone, INSTRUMENT_VOICES[instrument]);
-        this.triggers.set(instrument, trigger);
-      }
-      trigger(tone.now());
+      this.triggerFor(tone, instrument)(tone.now());
     } catch {
       // Fire-and-forget: feedback must never interrupt the editing workflow.
     }
+  }
+
+  private triggerFor(tone: ToneRuntime, instrument: Instrument): Trigger {
+    let trigger = this.triggers.get(instrument);
+    if (!trigger) {
+      trigger = this.buildTrigger(tone, INSTRUMENT_VOICES[instrument]);
+      this.triggers.set(instrument, trigger);
+    }
+    return trigger;
   }
 
   private buildTrigger(tone: ToneRuntime, config: VoiceConfig): Trigger {
