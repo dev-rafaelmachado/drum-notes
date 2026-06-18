@@ -16,6 +16,7 @@ import { cn } from "@/lib/utils";
 import { ExportButtons } from "@/features/export/components/ExportButtons";
 import { MetronomePanel } from "@/features/metronome/components/MetronomePanel";
 import { ScorePlaybackControls } from "@/features/score-playback/components/ScorePlaybackControls";
+import { SpeedControl } from "@/features/score-playback/components/SpeedControl";
 import { SyncProjectionControls } from "@/features/sync/components/SyncProjectionControls";
 import type { SaveStatus } from "../stores/editor-store";
 
@@ -82,6 +83,8 @@ export function EditorToolbar({
         </span>
 
         <ScorePlaybackControls score={score} />
+
+        <SpeedControl />
 
         <MetronomePanel bpm={score.bpm} timeSignature={score.timeSignature} />
 
