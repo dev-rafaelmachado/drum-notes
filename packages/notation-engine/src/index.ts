@@ -50,6 +50,8 @@ export { stepsPerMeasure, stepsPerBeat, isValidPosition } from "./validation/pos
 export { beatsPerMeasure, secondsPerBeat, isAccentBeat } from "./playback/metronome";
 export type { ScheduledNote, PlaybackSchedule } from "./playback/schedule";
 export { buildPlaybackSchedule } from "./playback/schedule";
+export type { LoopRegion } from "./playback/loop";
+export { loopRegion } from "./playback/loop";
 
 // Synchronization (stored separately from notation — see docs/adr/008-score-sync.md)
 export type { MeasureTimestamp, SyncMap } from "./sync/sync-map";
