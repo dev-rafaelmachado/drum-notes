@@ -76,8 +76,10 @@ export function ScoreEditor({ scoreId }: { scoreId: string }): React.JSX.Element
         onBpmChange={setBpm}
         onAddMeasure={addMeasure}
       />
-      <main className="mx-auto max-w-5xl space-y-4 px-6 py-6">
+      <div className="sticky top-24 z-5 mx-auto max-w-5xl px-6 pt-4">
         <AudioPanel audio={score.audio ?? null} />
+      </div>
+      <main className="mx-auto max-w-5xl space-y-4 px-6 py-4">
         {layout.measures.map((measure, index) => (
           <EditorMeasure
             key={measure.id}
