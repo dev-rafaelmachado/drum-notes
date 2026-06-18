@@ -35,8 +35,12 @@ score representation.
 > timing from the domain model. **Phase 2 — Audio Synchronization** is advanced
 > by measure timestamp projection ([AUDIO-006](../specs/measure-timestamp-projection/spec.md)),
 > which anchors one measure and projects the rest from the project's tempo,
-> reusing the SyncMap from [ADR-008](../adr/008-score-sync.md). Their **automatic**
-> counterparts (BPM/measure/beat detection, AI sync) remain Phase 3.
+> reusing the SyncMap from [ADR-008](../adr/008-score-sync.md). On top of
+> playback, **practice tooling** begins with loop + speed control
+> ([PRACT-001 / SKI-17](../specs/loop-speed-control/spec.md),
+> [ADR-011](../adr/011-loop-speed.md)): a measure-range loop and a pitch-preserving
+> speed control, both session-only, layered on the AUDIO-005 transport. Their
+> **automatic** counterparts (BPM/measure/beat detection, AI sync) remain Phase 3.
 
 ---
 

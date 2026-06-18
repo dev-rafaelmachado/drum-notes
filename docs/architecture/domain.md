@@ -102,7 +102,8 @@ Every consumer reads from and writes to this model:
 
 * **UI** ([frontend.md](frontend.md)) renders the model and dispatches edits.
 * **Persistence** ([storage.md](storage.md)) serialises the model to IndexedDB.
-* **Playback** (Phase 1) prepares Tone.js scheduling from the model.
+* **Playback** (Phase 1) prepares Tone.js scheduling from the model; practice
+  loops are a pure projection of that schedule (`loopRegion`), never a new model.
 * **Export** produces PDF/PNG from the model.
 
 Because all consumers share one model, a change to the domain propagates

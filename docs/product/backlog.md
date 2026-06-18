@@ -270,20 +270,23 @@ Medium
 
 ## Practice Suite
 
-### PRACT-001 — Loop Playback + Speed Control
+### PRACT-001 — Loop Playback + Speed Control (SKI-17)
 
-Status: Ideas
+Status: Specified — see [loop-speed-control spec](../specs/loop-speed-control/spec.md)
 
 Description:
 Loop a range of measures during playback and adjust playback speed. These
 two features share the same UI surface in the transport controls and serve
-the core practice use case.
+the core practice use case. Built on AUDIO-005 score playback: the loop window
+is a pure projection of the playback schedule and speed scales the transport
+rate (pitch unchanged); both are session-only. Realises roadmap Phase 1
+(Playback) practice tooling and is the foundation for PRACT-002 and AUDIO-007.
 
 Features:
 
 * **Loop**: set loop start/end measures; playback repeats the section
 * **Speed control**: 0.5x / 0.75x / 1x / 1.5x / 2x playback rate
-* Speed control uses Tone.js Transport `playbackRate` (no pitch change)
+* Speed scales the transport rate (via `Transport.bpm` in Tone v15, no pitch change)
 * Loop and speed persist per session (not saved to score)
 * Visual loop region indicator on the measure headers
 
