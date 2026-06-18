@@ -10,6 +10,7 @@ type InstrumentRowProps = {
   readonly label: string;
   readonly cells: readonly boolean[];
   readonly stepsPerBeat: number;
+  readonly playheadStep?: number;
   readonly onToggle: (instrument: Instrument, position: number) => void;
 };
 
@@ -18,6 +19,7 @@ function InstrumentRowComponent({
   label,
   cells,
   stepsPerBeat,
+  playheadStep = -1,
   onToggle,
 }: InstrumentRowProps): React.JSX.Element {
   return (
@@ -28,6 +30,7 @@ function InstrumentRowComponent({
       <div className="flex">
         {cells.map((active, position) => {
           const isBeatStart = position % stepsPerBeat === 0;
+          const isPlayhead = position === playheadStep;
           return (
             <button
               key={position}
@@ -38,7 +41,9 @@ function InstrumentRowComponent({
               className={cn(
                 "h-6 w-6 border border-neutral-200 transition-colors hover:bg-neutral-100",
                 isBeatStart && "border-l-2 border-l-neutral-400",
+                isPlayhead && "bg-blue-100",
                 active && "bg-neutral-900 hover:bg-neutral-700",
+                isPlayhead && active && "bg-blue-600 hover:bg-blue-500",
               )}
             >
               <span

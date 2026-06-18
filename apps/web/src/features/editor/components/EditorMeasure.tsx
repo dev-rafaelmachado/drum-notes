@@ -3,6 +3,8 @@
 import * as React from "react";
 import type { Instrument, LayoutMeasure } from "@drum-notes/notation-engine";
 
+import { MeasurePlaybackButton } from "@/features/score-playback/components/MeasurePlaybackButton";
+import { usePlaybackStore } from "@/features/score-playback/stores/playback-store";
 import { MeasureSyncControls } from "@/features/sync/components/MeasureSyncControls";
 import { useActiveMeasure } from "@/features/sync/hooks/useActiveMeasure";
 import { MeasureView } from "./MeasureView";
@@ -31,7 +33,12 @@ export function EditorMeasure({
   readonly onDuplicate: (measureId: string) => void;
   readonly onRemove: (measureId: string) => void;
 }): React.JSX.Element {
-  const isActive = useActiveMeasure(measure.id);
+  // The playhead step for *this* measure, or -1 when playback is elsewhere or
+  // stopped — so only the playing measure re-renders as the highlight advances.
+  const playheadStep = usePlaybackStore((state) =>
+    state.status !== "idle" && state.currentMeasureIndex === index ? state.currentStep : -1,
+  );
+  const isActive = useActiveMeasure(measure.id) || playheadStep >= 0;
 
   return (
     <MeasureView
@@ -40,12 +47,16 @@ export function EditorMeasure({
       stepsPerBeat={stepsPerBeat}
       canRemove={canRemove}
       isActive={isActive}
+      playheadStep={playheadStep}
       headerActions={
-        <MeasureSyncControls
-          measureId={measure.id}
-          index={index}
-          orderedMeasureIds={orderedMeasureIds}
-        />
+        <>
+          <MeasurePlaybackButton measureIndex={index} />
+          <MeasureSyncControls
+            measureId={measure.id}
+            index={index}
+            orderedMeasureIds={orderedMeasureIds}
+          />
+        </>
       }
       onToggle={onToggle}
       onDuplicate={onDuplicate}

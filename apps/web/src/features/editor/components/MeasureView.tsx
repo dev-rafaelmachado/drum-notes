@@ -14,6 +14,7 @@ type MeasureViewProps = {
   readonly stepsPerBeat: number;
   readonly canRemove: boolean;
   readonly isActive?: boolean;
+  readonly playheadStep?: number;
   readonly headerActions?: React.ReactNode;
   readonly onToggle: (measureId: string, instrument: Instrument, position: number) => void;
   readonly onDuplicate: (measureId: string) => void;
@@ -26,6 +27,7 @@ function MeasureViewComponent({
   stepsPerBeat,
   canRemove,
   isActive = false,
+  playheadStep = -1,
   headerActions,
   onToggle,
   onDuplicate,
@@ -92,6 +94,7 @@ function MeasureViewComponent({
             label={row.label}
             cells={row.cells}
             stepsPerBeat={stepsPerBeat}
+            playheadStep={playheadStep}
             onToggle={handleToggle}
           />
         ))}
