@@ -3,8 +3,10 @@
 import * as React from "react";
 import type { Instrument, LayoutMeasure } from "@drum-notes/notation-engine";
 
+import { MeasureLoopButton } from "@/features/score-playback/components/MeasureLoopButton";
 import { MeasurePlaybackButton } from "@/features/score-playback/components/MeasurePlaybackButton";
 import { usePlaybackStore } from "@/features/score-playback/stores/playback-store";
+import type { LoopRole } from "./MeasureView";
 import { MeasureSyncControls } from "@/features/sync/components/MeasureSyncControls";
 import { useActiveMeasure } from "@/features/sync/hooks/useActiveMeasure";
 import { MeasureView } from "./MeasureView";
@@ -40,6 +42,25 @@ export function EditorMeasure({
   );
   const isActive = useActiveMeasure(measure.id) || playheadStep >= 0;
 
+  // This measure's role in the loop region (or "none"). A per-measure string
+  // selector keeps re-renders local when the loop changes.
+  const loopRole = usePlaybackStore((state): LoopRole => {
+    const loop = state.loop;
+    if (!loop || index < loop.start || index > loop.end) {
+      return "none";
+    }
+    if (loop.start === loop.end) {
+      return "single";
+    }
+    if (index === loop.start) {
+      return "start";
+    }
+    if (index === loop.end) {
+      return "end";
+    }
+    return "inside";
+  });
+
   return (
     <MeasureView
       measure={measure}
@@ -48,8 +69,10 @@ export function EditorMeasure({
       canRemove={canRemove}
       isActive={isActive}
       playheadStep={playheadStep}
+      loopRole={loopRole}
       headerActions={
         <>
+          <MeasureLoopButton measureIndex={index} inLoop={loopRole !== "none"} />
           <MeasurePlaybackButton measureIndex={index} />
           <MeasureSyncControls
             measureId={measure.id}
