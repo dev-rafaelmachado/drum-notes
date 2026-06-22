@@ -1,0 +1,26 @@
+<svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Drum Notes logo">
+  <defs>
+    <linearGradient id="dn-grad" x1="40" y1="24" x2="220" y2="236" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFB020"/>
+      <stop offset="1" stop-color="#FF4D2E"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Tile -->
+  <rect width="256" height="256" rx="60" fill="url(#dn-grad)"/>
+
+  <!-- Drum body -->
+  <g stroke="#fff" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <path d="M66 150 v20 a62 26 0 0 0 124 0 v-20" />
+    <ellipse cx="128" cy="150" rx="62" ry="26" />
+  </g>
+  <ellipse cx="128" cy="150" rx="62" ry="26" fill="#fff" fill-opacity="0.14"/>
+
+  <!-- Crossed drumsticks -->
+  <g stroke="#fff" stroke-width="13" stroke-linecap="round">
+    <line x1="94" y1="150" x2="152" y2="56"/>
+    <line x1="162" y1="150" x2="104" y2="56"/>
+  </g>
+  <circle cx="152" cy="55" r="5" fill="#fff"/>
+  <circle cx="104" cy="55" r="5" fill="#fff"/>
+</svg>
