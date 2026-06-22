@@ -11,6 +11,9 @@ import { InstrumentRow } from "./InstrumentRow";
 /** A measure's place in the loop region (PRACT-001). */
 export type LoopRole = "none" | "single" | "start" | "end" | "inside";
 
+/** Where the reorder drop indicator sits relative to this measure (EDIT-004). */
+export type DropEdge = "none" | "top" | "bottom";
+
 type MeasureViewProps = {
   readonly measure: LayoutMeasure;
   readonly index: number;
@@ -20,6 +23,15 @@ type MeasureViewProps = {
   readonly playheadStep?: number;
   readonly loopRole?: LoopRole;
   readonly headerActions?: React.ReactNode;
+  /** Drag affordance shown at the start of the header (EDIT-004). */
+  readonly dragHandle?: React.ReactNode;
+  /** Drag-and-drop handlers making this measure a drop target (EDIT-004). */
+  readonly dropTargetProps?: Pick<
+    React.HTMLAttributes<HTMLElement>,
+    "onDragOver" | "onDrop"
+  >;
+  readonly dropEdge?: DropEdge;
+  readonly isDragging?: boolean;
   readonly onToggle: (measureId: string, instrument: Instrument, position: number) => void;
   readonly onDuplicate: (measureId: string) => void;
   readonly onRemove: (measureId: string) => void;
@@ -34,6 +46,10 @@ function MeasureViewComponent({
   playheadStep = -1,
   loopRole = "none",
   headerActions,
+  dragHandle,
+  dropTargetProps,
+  dropEdge = "none",
+  isDragging = false,
   onToggle,
   onDuplicate,
   onRemove,
@@ -55,17 +71,33 @@ function MeasureViewComponent({
   return (
     <section
       ref={ref}
+      {...dropTargetProps}
       aria-current={isActive ? "true" : undefined}
       className={cn(
-        "rounded-lg border bg-white p-4 transition-colors",
+        "relative rounded-lg border bg-white p-4 transition-colors",
         isActive ? "border-blue-500 ring-2 ring-blue-300" : "border-neutral-200",
         // Loop region (PRACT-001): a violet left rail spans the looped measures,
         // distinct from the blue "playing" highlight and visible alongside it.
         inLoop && "border-l-4 border-l-violet-500",
+        // The dragged source fades while it is being moved (EDIT-004).
+        isDragging && "opacity-50",
       )}
     >
+      {/* Reorder drop indicator (EDIT-004): a bar in the gap where the measure
+          will land. Position — not colour — conveys the target. */}
+      {dropEdge !== "none" ? (
+        <div
+          aria-hidden
+          className={cn(
+            "pointer-events-none absolute inset-x-3 h-1 rounded-full bg-violet-500",
+            dropEdge === "top" ? "-top-2.5" : "-bottom-2.5",
+          )}
+        />
+      ) : null}
+
       <header className="mb-3 flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">
+          {dragHandle}
           <h3 className="text-sm font-semibold text-neutral-700">Measure {index + 1}</h3>
           {loopRole === "start" || loopRole === "single" ? (
             <span className="rounded bg-violet-100 px-1.5 py-0.5 text-xs font-medium text-violet-700">

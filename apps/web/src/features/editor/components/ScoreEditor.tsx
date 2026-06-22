@@ -85,6 +85,7 @@ export function ScoreEditor({ scoreId }: { scoreId: string }): React.JSX.Element
             key={measure.id}
             measure={measure}
             index={index}
+            measureCount={layout.measures.length}
             stepsPerBeat={layout.stepsPerBeat}
             canRemove={layout.measures.length > 1}
             orderedMeasureIds={orderedMeasureIds}
