@@ -244,9 +244,9 @@ Medium
 
 ---
 
-### EDIT-004 — Drag-and-Drop Measure Reordering
+### EDIT-004 — Drag-and-Drop Measure Reordering (SKI-16)
 
-Status: Ideas
+Status: Specified — see [measure-reordering spec](../specs/measure-reordering/spec.md)
 
 Description:
 Reorder measures by dragging them in the editor. Uses the existing
@@ -500,3 +500,227 @@ teachers producing printed material.
 
 Priority:
 Low
+
+---
+
+## Design System
+
+Migrate the UI from the **default shadcn/ui neutral theme** to the **Drum Notes
+design system** (brand tokens, accent palette, dark mode, on-brand exports).
+Epic PRD: [design-system/prd.md](../specs/design-system/prd.md) ·
+Decision: [ADR-012](../adr/012-design-system.md) (Proposed) ·
+Brand source: [docs/brand](../brand).
+
+`DESIGN-001` is the foundation; every other DESIGN issue depends on it.
+
+### DESIGN-001 — Design Token Foundation
+
+Status: Backlog — see [PRD](../specs/design-system/prd.md)
+
+Description:
+Establish the canonical design tokens (primitive → semantic → component layers)
+as a framework-agnostic source, and wire them into Tailwind v4 `@theme` / CSS
+variables. Map to the **current neutrals first** for visual parity (zero brand
+change), so later phases only flip values.
+
+Features:
+
+* `tokens.ts` (or equivalent) as the single token source
+* Tailwind `@theme` + CSS-variable wiring in `globals.css`
+* Light-mode parity with today's look (no visible change)
+* Token reference documented
+
+Value:
+Unlocks every other DS phase; makes retheming a token edit, not a rewrite.
+
+Priority:
+High
+
+---
+
+### DESIGN-002 — Brand Theming
+
+Status: Backlog
+
+Description:
+Apply the Drum Notes brand palette through the tokens: `primary = strike`,
+`accent = heat`, `ring`, and editor `playhead/active` (replacing today's blue).
+First visible brand shift.
+
+Features:
+
+* Brand semantic mapping (primary/accent/ring/destructive)
+* Distinct `destructive` crimson (disambiguated from the warm primary)
+* Signature `heat → strike` gradient available as a token/utility
+
+Value:
+The app starts to look like Drum Notes instead of stock shadcn.
+
+Dependencies: DESIGN-001.
+Priority: High
+
+---
+
+### DESIGN-003 — Promote Shared Primitives to `packages/ui`
+
+Status: Backlog
+
+Description:
+Move `button`, `input`, `label`, `select` out of `apps/web` into the
+`packages/ui` design-system package, token-driven, with no business logic
+(per [architecture.md](../../.claude/architecture.md)).
+
+Features:
+
+* Token-driven primitives in `packages/ui`
+* `apps/web` imports from the package
+* Re-skin only (keep shadcn/Radix behaviour)
+
+Value:
+One branded primitive set reusable across web/mobile/desktop.
+
+Dependencies: DESIGN-001.
+Priority: Medium
+
+---
+
+### DESIGN-004 — Restyle Feature Components
+
+Status: Backlog
+
+Description:
+Replace hardcoded color classes (`neutral-*`, `blue-*`, `red-*`, …) across the
+~18 feature components (editor, audio, project, sync, metronome, playback) with
+semantic tokens.
+
+Features:
+
+* Tokens applied to all feature surfaces
+* Raw palette classes removed from feature code
+* Per-feature visual verification
+
+Value:
+Consistent, on-brand UI; styling no longer scattered.
+
+Dependencies: DESIGN-002.
+Priority: Medium
+
+---
+
+### DESIGN-005 — Editor Visual Language
+
+Status: Backlog
+
+Description:
+Define and apply editor-specific tokens — `grid-line`, `beat-line`, `note`,
+`note-foreground`, `playhead`, `active-measure`, `surface` — to `InstrumentRow`
+and `MeasureView` so the grid reads as intentional brand design.
+
+Features:
+
+* Editor/domain token set
+* Grid, beat separators, note cells, playhead, active-measure styled via tokens
+* Accessibility: state never conveyed by colour alone
+
+Value:
+The core editing surface — the product's heart — looks designed, not default.
+
+Dependencies: DESIGN-002.
+Priority: Medium
+
+---
+
+### DESIGN-006 — Brand-Consistent Exports
+
+Status: Backlog
+
+Description:
+Make `render-score-canvas.ts` paint from the shared token source instead of the
+8 literal hex values, so PDF/PNG exports match the on-screen brand.
+
+Features:
+
+* Canvas reads colours from the shared `tokens.ts`
+* No hex literals in the renderer
+* Screen vs. export visual parity
+
+Value:
+Exports look like the same product as the app and the brand.
+
+Dependencies: DESIGN-001.
+Priority: Medium
+
+---
+
+### DESIGN-007 — Dark Mode
+
+Status: Backlog
+
+Description:
+Add a dark theme built from the same semantic tokens (ink background, elevated
+surfaces, vivid brand accents), with a toggle.
+
+Features:
+
+* `.dark` token overrides
+* Theme toggle + persisted preference
+* WCAG AA contrast in dark mode
+
+Value:
+Comfortable low-light editing; a modern, expected feature.
+
+Dependencies: DESIGN-002.
+Priority: Low
+
+---
+
+### DESIGN-008 — Design-System Docs, Storybook & Governance
+
+Status: Backlog
+
+Description:
+Document token usage and component guidelines, **set up Storybook** as the
+living catalogue of the design system, and add a lint rule that forbids raw
+color classes in feature code.
+
+Features:
+
+* Design-system usage guide (tokens, do/don't, gradient & typography rules)
+* **Storybook** cataloguing `packages/ui` primitives and tokens (stories per
+  component + theme/dark-mode switcher)
+* Optional visual-regression on top of Storybook (Chromatic / Playwright snapshots)
+* ESLint rule banning `neutral-*` / `blue-*` / raw hex in feature code
+* Contribution note in `.claude` / frontend docs
+
+Value:
+Keeps the system consistent as the app grows; Storybook makes components
+discoverable and reviewable; the lint rule prevents regression to ad-hoc colours.
+
+Dependencies: DESIGN-003 (primitives to catalogue), DESIGN-004.
+Priority: Low
+
+---
+
+### DESIGN-009 — Brand Typography
+
+Status: Backlog
+
+Description:
+Adopt the Drum Notes brand typefaces and expose them as tokens: **Space Grotesk**
+(display/headings), **Inter** (body/UI), and optional **Space Mono** (numerics —
+BPM, timecodes). Loaded via `next/font` (self-hosted, no layout shift, offline).
+
+Features:
+
+* `next/font` integration for Space Grotesk + Inter (+ optional Space Mono)
+* Typography tokens: `--font-display`, `--font-sans`, `--font-mono`, and a
+  type-scale (`--text-xs … --text-3xl`) with weight/letter-spacing rules
+* Headings/wordmark use display; body/UI uses Inter; mono reserved for tempo/timecodes
+* Fallback stacks for offline / font-loading
+
+Value:
+Replaces generic system fonts with a distinct brand voice; reinforces the
+identity established by the logo and palette.
+
+Dependencies: DESIGN-001 (token foundation).
+Priority: Medium
