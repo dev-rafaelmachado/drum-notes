@@ -26,6 +26,7 @@ type EditorState = {
   setBpm: (bpm: number) => void;
   addMeasure: () => void;
   removeMeasure: (measureId: string) => void;
+  moveMeasure: (measureId: string, toIndex: number) => void;
   duplicateMeasure: (measureId: string) => void;
   toggleNote: (measureId: string, instrument: Instrument, position: number) => void;
   attachAudio: (audio: AudioReference) => void;
@@ -85,6 +86,8 @@ export const useEditorStore = create<EditorState>((set, get) => {
     setBpm: (bpm) => edit((score) => engine.setBpm(score, bpm)),
     addMeasure: () => edit((score) => engine.addMeasure(score)),
     removeMeasure: (measureId) => edit((score) => engine.removeMeasure(score, measureId)),
+    moveMeasure: (measureId, toIndex) =>
+      edit((score) => engine.moveMeasure(score, measureId, toIndex)),
     duplicateMeasure: (measureId) =>
       edit((score) => engine.duplicateMeasure(score, measureId)),
     toggleNote: (measureId, instrument, position) =>
