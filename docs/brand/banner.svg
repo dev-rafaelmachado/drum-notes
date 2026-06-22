@@ -35,7 +35,7 @@
   </g>
 
   <!-- Wordmark -->
-  <text x="260" y="178" font-family="'Inter', 'Segoe UI', system-ui, sans-serif" font-size="78" font-weight="800" letter-spacing="-2">
+  <text x="260" y="178" font-family="'Space Grotesk', 'Inter', system-ui, sans-serif" font-size="78" font-weight="800" letter-spacing="-2">
     <tspan fill="#FFFFFF">Drum</tspan><tspan fill="url(#bn-grad)"> Notes</tspan>
   </text>
   <text x="262" y="226" font-family="'Inter', 'Segoe UI', system-ui, sans-serif" font-size="26" font-weight="500" fill="#9CA3AF">
