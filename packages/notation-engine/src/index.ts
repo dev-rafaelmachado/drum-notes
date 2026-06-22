@@ -39,7 +39,7 @@ export {
 export type { CreateScoreInput } from "./operations/create-score";
 export { createScore } from "./operations/create-score";
 export { setTitle, setBpm } from "./operations/score-settings";
-export { addMeasure, removeMeasure, duplicateMeasure } from "./operations/measures";
+export { addMeasure, removeMeasure, moveMeasure, duplicateMeasure } from "./operations/measures";
 export { toggleNote, hasNote } from "./operations/notes";
 export { attachAudio, detachAudio } from "./operations/audio";
 
