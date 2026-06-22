@@ -23,10 +23,12 @@ decision records below — there is intentionally no duplicated content here.
 * [ADR-001 — Zustand](adr/001-zustand.md) — state management.
 * [ADR-002 — IndexedDB](adr/002-indexeddb.md) — local persistence.
 * [ADR-003 — Score model](adr/003-score-model.md) — single source of truth.
+* [ADR-012 — Design system](adr/012-design-system.md) — design tokens & brand DS *(Proposed)*.
 
 ## Specification
 
 * [Score Editor](specs/score-editor/spec.md) · [Tasks](specs/score-editor/tasks.md) · [Tests](specs/score-editor/tests.md)
+* [Design System Migration](specs/design-system/prd.md) — PRD (Backlog).
 
 ## Governing Rules
 

@@ -87,3 +87,24 @@ store should be testable without React.
 
 See [.claude/coding-standards.md](../../.claude/coding-standards.md) for the
 full standards.
+
+---
+
+## Design System
+
+> **Status:** migration planned, not yet implemented.
+
+**Today:** the UI uses the stock **shadcn/ui** "new-york" theme on a flat
+`neutral` base, with colours hardcoded as Tailwind palette classes across
+components. The shared `packages/ui` package is an empty stub.
+
+**Target:** a **token-driven Drum Notes design system** — semantic design tokens
+(brand → semantic → editor-domain) as the single styling source, consumed by both
+DOM components and the export canvas, with shared primitives promoted to
+`packages/ui` and a dark theme. Feature components reference tokens, never raw
+palette classes.
+
+See the [Design System Migration PRD](../specs/design-system/prd.md) and
+[ADR-012](../adr/012-design-system.md) *(Proposed)*; brand assets live in
+[docs/brand](../brand). Tracked as `DESIGN-00x` in the
+[backlog](../product/backlog.md#design-system).

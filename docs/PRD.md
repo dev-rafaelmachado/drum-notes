@@ -22,6 +22,14 @@ below — there is intentionally no duplicated content here.
   requirements, out-of-scope, and acceptance criteria.
 * [Tasks](specs/score-editor/tasks.md) · [Test cases](specs/score-editor/tests.md)
 
+## Design System
+
+* [Design System Migration PRD](specs/design-system/prd.md) — moving the UI from
+  the default shadcn theme to the Drum Notes brand design system (tokens, dark
+  mode, on-brand exports). Decision: [ADR-012](adr/012-design-system.md)
+  *(Proposed)*. Brand assets: [docs/brand](brand). Issues: `DESIGN-00x` in the
+  [backlog](product/backlog.md#design-system).
+
 ## Technical
 
 * See the [Technical Specification index](TS.md) for architecture and decisions.

@@ -55,6 +55,13 @@ score representation.
 * **Offline-first is preserved** through Phase 5: cloud sharing layers on top of
   local persistence, it does not replace it.
 
+> **Cross-cutting track — Design System.** Independent of the delivery phases, the
+> UI migrates from the default shadcn theme to the Drum Notes brand design system
+> (see the [design-system PRD](../specs/design-system/prd.md) and
+> [ADR-012](../adr/012-design-system.md), tracked as `DESIGN-00x` in the
+> [backlog](backlog.md#design-system)). It is a re-skin, not a delivery phase, and
+> does not change the domain model.
+
 ---
 
 ## Out of Scope for the MVP
