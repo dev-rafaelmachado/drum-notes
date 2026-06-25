@@ -11,6 +11,7 @@ import { MeasureSyncControls } from "@/features/sync/components/MeasureSyncContr
 import { useActiveMeasure } from "@/features/sync/hooks/useActiveMeasure";
 import { useMeasureReorder } from "../hooks/useMeasureReorder";
 import { useReorderStore } from "../stores/reorder-store";
+import { useEditorStore } from "../stores/editor-store";
 import { MeasureDragHandle, MeasureMoveButtons } from "./MeasureReorderControls";
 import { MeasureView } from "./MeasureView";
 
@@ -90,6 +91,10 @@ export function EditorMeasure({
   });
   const isDragging = useReorderStore((state) => state.draggingIndex === index);
 
+  // Selection (EDIT-003). Per-measure selector so only the toggled measure re-renders.
+  const isSelected = useEditorStore((state) => state.selectedMeasureIds.has(measure.id));
+  const selectMeasure = useEditorStore((state) => state.selectMeasure);
+
   return (
     <MeasureView
       measure={measure}
@@ -105,6 +110,8 @@ export function EditorMeasure({
       dropTargetProps={reorderable ? reorder.dropTargetProps : undefined}
       dropEdge={dropEdge}
       isDragging={isDragging}
+      isSelected={isSelected}
+      onSelect={selectMeasure}
       headerActions={
         <>
           {reorderable ? (

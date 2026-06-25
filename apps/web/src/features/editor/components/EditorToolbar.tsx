@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { ArrowLeft, Plus, Redo2, Undo2 } from "lucide-react";
+import { ArrowLeft, Clipboard, Copy, Plus, Redo2, Undo2 } from "lucide-react";
 import {
   formatTimeSignature,
   SUBDIVISION_LABELS,
@@ -32,11 +32,15 @@ type EditorToolbarProps = {
   readonly saveStatus: SaveStatus;
   readonly canUndo: boolean;
   readonly canRedo: boolean;
+  readonly canCopy: boolean;
+  readonly canPaste: boolean;
   readonly onUndo: () => void;
   readonly onRedo: () => void;
   readonly onTitleChange: (title: string) => void;
   readonly onBpmChange: (bpm: number) => void;
   readonly onAddMeasure: () => void;
+  readonly onCopy: () => void;
+  readonly onPaste: () => void;
 };
 
 export function EditorToolbar({
@@ -44,11 +48,15 @@ export function EditorToolbar({
   saveStatus,
   canUndo,
   canRedo,
+  canCopy,
+  canPaste,
   onUndo,
   onRedo,
   onTitleChange,
   onBpmChange,
   onAddMeasure,
+  onCopy,
+  onPaste,
 }: EditorToolbarProps): React.JSX.Element {
   return (
     <header className="sticky top-0 z-10 border-b border-neutral-200 bg-white/90 backdrop-blur">
@@ -78,6 +86,24 @@ export function EditorToolbar({
           aria-label="Redo"
         >
           <Redo2 className="h-4 w-4" />
+        </Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          disabled={!canCopy}
+          onClick={onCopy}
+          aria-label="Copy selected measures"
+        >
+          <Copy className="h-4 w-4" />
+        </Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          disabled={!canPaste}
+          onClick={onPaste}
+          aria-label="Paste measures"
+        >
+          <Clipboard className="h-4 w-4" />
         </Button>
 
         <Input
