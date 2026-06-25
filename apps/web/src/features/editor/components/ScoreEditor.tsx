@@ -8,6 +8,7 @@ import { AudioPanel } from "@/features/audio/components/AudioPanel";
 import { instrumentPlayer } from "@/features/instrument-audio/services/instrument-player";
 import { useSyncStore } from "@/features/sync/stores/sync-store";
 import { useEditorStore } from "../stores/editor-store";
+import { useUndoRedo } from "../hooks/useUndoRedo";
 import { EditorToolbar } from "./EditorToolbar";
 import { EditorMeasure } from "./EditorMeasure";
 
@@ -15,7 +16,11 @@ export function ScoreEditor({ scoreId }: { scoreId: string }): React.JSX.Element
   const score = useEditorStore((state) => state.score);
   const loadStatus = useEditorStore((state) => state.loadStatus);
   const saveStatus = useEditorStore((state) => state.saveStatus);
+  const canUndo = useEditorStore((state) => state.canUndo);
+  const canRedo = useEditorStore((state) => state.canRedo);
   const loadScore = useEditorStore((state) => state.loadScore);
+  const undo = useEditorStore((state) => state.undo);
+  const redo = useEditorStore((state) => state.redo);
   const setTitle = useEditorStore((state) => state.setTitle);
   const setBpm = useEditorStore((state) => state.setBpm);
   const addMeasure = useEditorStore((state) => state.addMeasure);
@@ -23,6 +28,8 @@ export function ScoreEditor({ scoreId }: { scoreId: string }): React.JSX.Element
   const duplicateMeasure = useEditorStore((state) => state.duplicateMeasure);
   const toggleNote = useEditorStore((state) => state.toggleNote);
   const hydrateSync = useSyncStore((state) => state.hydrate);
+
+  useUndoRedo();
 
   const handleToggle = React.useCallback(
     (measureId: string, instrument: Instrument, position: number) => {
@@ -72,6 +79,10 @@ export function ScoreEditor({ scoreId }: { scoreId: string }): React.JSX.Element
       <EditorToolbar
         score={score}
         saveStatus={saveStatus}
+        canUndo={canUndo}
+        canRedo={canRedo}
+        onUndo={undo}
+        onRedo={redo}
         onTitleChange={setTitle}
         onBpmChange={setBpm}
         onAddMeasure={addMeasure}

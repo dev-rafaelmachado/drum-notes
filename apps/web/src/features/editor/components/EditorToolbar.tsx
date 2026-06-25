@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { ArrowLeft, Plus } from "lucide-react";
+import { ArrowLeft, Plus, Redo2, Undo2 } from "lucide-react";
 import {
   formatTimeSignature,
   SUBDIVISION_LABELS,
@@ -30,6 +30,10 @@ const SAVE_LABELS: Record<SaveStatus, string> = {
 type EditorToolbarProps = {
   readonly score: Score;
   readonly saveStatus: SaveStatus;
+  readonly canUndo: boolean;
+  readonly canRedo: boolean;
+  readonly onUndo: () => void;
+  readonly onRedo: () => void;
   readonly onTitleChange: (title: string) => void;
   readonly onBpmChange: (bpm: number) => void;
   readonly onAddMeasure: () => void;
@@ -38,6 +42,10 @@ type EditorToolbarProps = {
 export function EditorToolbar({
   score,
   saveStatus,
+  canUndo,
+  canRedo,
+  onUndo,
+  onRedo,
   onTitleChange,
   onBpmChange,
   onAddMeasure,
@@ -52,6 +60,25 @@ export function EditorToolbar({
         >
           <ArrowLeft className="h-4 w-4" />
         </Link>
+
+        <Button
+          variant="ghost"
+          size="icon"
+          disabled={!canUndo}
+          onClick={onUndo}
+          aria-label="Undo"
+        >
+          <Undo2 className="h-4 w-4" />
+        </Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          disabled={!canRedo}
+          onClick={onRedo}
+          aria-label="Redo"
+        >
+          <Redo2 className="h-4 w-4" />
+        </Button>
 
         <Input
           aria-label="Score title"
