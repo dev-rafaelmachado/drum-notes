@@ -9,6 +9,7 @@ import { instrumentPlayer } from "@/features/instrument-audio/services/instrumen
 import { useSyncStore } from "@/features/sync/stores/sync-store";
 import { useEditorStore } from "../stores/editor-store";
 import { useUndoRedo } from "../hooks/useUndoRedo";
+import { useCopyPaste } from "../hooks/useCopyPaste";
 import { EditorToolbar } from "./EditorToolbar";
 import { EditorMeasure } from "./EditorMeasure";
 
@@ -18,6 +19,8 @@ export function ScoreEditor({ scoreId }: { scoreId: string }): React.JSX.Element
   const saveStatus = useEditorStore((state) => state.saveStatus);
   const canUndo = useEditorStore((state) => state.canUndo);
   const canRedo = useEditorStore((state) => state.canRedo);
+  const canPaste = useEditorStore((state) => state.canPaste);
+  const selectedMeasureIds = useEditorStore((state) => state.selectedMeasureIds);
   const loadScore = useEditorStore((state) => state.loadScore);
   const undo = useEditorStore((state) => state.undo);
   const redo = useEditorStore((state) => state.redo);
@@ -27,9 +30,13 @@ export function ScoreEditor({ scoreId }: { scoreId: string }): React.JSX.Element
   const removeMeasure = useEditorStore((state) => state.removeMeasure);
   const duplicateMeasure = useEditorStore((state) => state.duplicateMeasure);
   const toggleNote = useEditorStore((state) => state.toggleNote);
+  const copySelectedMeasures = useEditorStore((state) => state.copySelectedMeasures);
+  const pasteMeasures = useEditorStore((state) => state.pasteMeasures);
+  const clearSelection = useEditorStore((state) => state.clearSelection);
   const hydrateSync = useSyncStore((state) => state.hydrate);
 
   useUndoRedo();
+  useCopyPaste();
 
   const handleToggle = React.useCallback(
     (measureId: string, instrument: Instrument, position: number) => {
@@ -74,18 +81,33 @@ export function ScoreEditor({ scoreId }: { scoreId: string }): React.JSX.Element
   const layout = buildScoreLayout(score);
   const orderedMeasureIds = layout.measures.map((measure) => measure.id);
 
+  const canCopy = selectedMeasureIds.size > 0;
+
   return (
-    <div className="min-h-screen bg-neutral-50">
+    <div
+      className="min-h-screen bg-neutral-50"
+      onClick={(e) => {
+        // Clear selection when clicking the background (not a measure or toolbar).
+        const target = e.target as HTMLElement;
+        if (!target.closest("section") && !target.closest("header")) {
+          clearSelection();
+        }
+      }}
+    >
       <EditorToolbar
         score={score}
         saveStatus={saveStatus}
         canUndo={canUndo}
         canRedo={canRedo}
+        canCopy={canCopy}
+        canPaste={canPaste}
         onUndo={undo}
         onRedo={redo}
         onTitleChange={setTitle}
         onBpmChange={setBpm}
         onAddMeasure={addMeasure}
+        onCopy={copySelectedMeasures}
+        onPaste={() => pasteMeasures()}
       />
       <div className="sticky top-24 z-5 mx-auto max-w-5xl px-6 pt-4">
         <AudioPanel audio={score.audio ?? null} />

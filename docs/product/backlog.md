@@ -221,7 +221,7 @@ High
 
 ### EDIT-003 — Copy / Paste Measures
 
-Status: Ideas
+Status: Specified — see [copy-paste-measures spec](../specs/copy-paste-measures/spec.md)
 
 Description:
 Select one or more measures, copy them, and paste at any position in the

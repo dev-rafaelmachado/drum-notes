@@ -336,3 +336,146 @@ describe("editor store — undo / redo", () => {
     expect(useEditorStore.getState().score!.measures.map((m) => m.id)).toEqual(orderBefore);
   });
 });
+
+describe("editor store — copy / paste (EDIT-003)", () => {
+  it("copy stores selected measures in score order", () => {
+    const score = createScore();
+    useEditorStore.getState().setCurrentScore(score);
+    useEditorStore.getState().addMeasure();
+    useEditorStore.getState().addMeasure();
+
+    const { score: s } = useEditorStore.getState();
+    const [idA, idB, idC] = s!.measures.map((m) => m.id);
+
+    // Shift-click from A to C selects contiguous range [A, B, C].
+    useEditorStore.getState().selectMeasure(idA!, false); // anchor at A
+    useEditorStore.getState().selectMeasure(idC!, true);  // extend to C
+
+    useEditorStore.getState().copySelectedMeasures();
+
+    const { clipboard } = useEditorStore.getState();
+    expect(clipboard).toHaveLength(3);
+    expect(clipboard!.map((m) => m.id)).toEqual([idA, idB, idC]);
+  });
+
+  it("copy does not mutate score or push history", () => {
+    const score = createScore();
+    const measureId = score.measures[0]!.id;
+    useEditorStore.getState().setCurrentScore(score);
+    useEditorStore.getState().selectMeasure(measureId, false);
+
+    useEditorStore.getState().copySelectedMeasures();
+
+    expect(useEditorStore.getState().score).toBe(score);
+    expect(useEditorStore.getState().past).toHaveLength(0);
+    expect(repository.saveScore).not.toHaveBeenCalled();
+  });
+
+  it("paste inserts copies with new ids", () => {
+    const score = createScore();
+    useEditorStore.getState().setCurrentScore(score);
+    useEditorStore.getState().addMeasure();
+
+    const { score: s } = useEditorStore.getState();
+    const [idA, idB] = s!.measures.map((m) => m.id);
+
+    useEditorStore.getState().selectMeasure(idA!, false);
+    useEditorStore.getState().copySelectedMeasures();
+    useEditorStore.getState().pasteMeasures(1);
+
+    const after = useEditorStore.getState().score!;
+    expect(after.measures).toHaveLength(3);
+    expect(after.measures[0]!.id).toBe(idA);
+    // The copy sits at index 1 with a new id.
+    expect(after.measures[1]!.id).not.toBe(idA);
+    expect(after.measures[2]!.id).toBe(idB);
+  });
+
+  it("paste is undoable", () => {
+    const score = createScore();
+    useEditorStore.getState().setCurrentScore(score);
+    useEditorStore.getState().addMeasure();
+
+    const idA = useEditorStore.getState().score!.measures[0]!.id;
+    useEditorStore.getState().selectMeasure(idA, false);
+    useEditorStore.getState().copySelectedMeasures();
+    useEditorStore.getState().pasteMeasures(2);
+
+    expect(useEditorStore.getState().score!.measures).toHaveLength(3);
+
+    useEditorStore.getState().undo();
+    expect(useEditorStore.getState().score!.measures).toHaveLength(2);
+  });
+
+  it("canPaste is false before any copy and true after", () => {
+    const score = createScore();
+    const measureId = score.measures[0]!.id;
+    useEditorStore.getState().setCurrentScore(score);
+
+    expect(useEditorStore.getState().canPaste).toBe(false);
+
+    useEditorStore.getState().selectMeasure(measureId, false);
+    useEditorStore.getState().copySelectedMeasures();
+
+    expect(useEditorStore.getState().canPaste).toBe(true);
+  });
+
+  it("selection clears on loadScore", () => {
+    const score = createScore();
+    const measureId = score.measures[0]!.id;
+    useEditorStore.getState().setCurrentScore(score);
+    useEditorStore.getState().selectMeasure(measureId, false);
+    expect(useEditorStore.getState().selectedMeasureIds.size).toBe(1);
+
+    void useEditorStore.getState().loadScore("other");
+
+    expect(useEditorStore.getState().selectedMeasureIds.size).toBe(0);
+  });
+
+  it("clipboard survives a loadScore (cross-project paste)", () => {
+    const score = createScore();
+    const measureId = score.measures[0]!.id;
+    useEditorStore.getState().setCurrentScore(score);
+    useEditorStore.getState().selectMeasure(measureId, false);
+    useEditorStore.getState().copySelectedMeasures();
+
+    void useEditorStore.getState().loadScore("other");
+
+    expect(useEditorStore.getState().canPaste).toBe(true);
+    expect(useEditorStore.getState().clipboard).toHaveLength(1);
+  });
+
+  it("paste with no explicit index inserts after the last selected measure", () => {
+    const score = createScore();
+    useEditorStore.getState().setCurrentScore(score);
+    useEditorStore.getState().addMeasure();
+    useEditorStore.getState().addMeasure();
+
+    const { score: s } = useEditorStore.getState();
+    const [idA, idB] = s!.measures.map((m) => m.id);
+
+    useEditorStore.getState().selectMeasure(idA!, false);
+    useEditorStore.getState().copySelectedMeasures();
+    // Select idB so the default target is after idB (index 2)
+    useEditorStore.getState().selectMeasure(idB!, false);
+    useEditorStore.getState().pasteMeasures();
+
+    const after = useEditorStore.getState().score!;
+    expect(after.measures).toHaveLength(4);
+    // Copy lands at index 2 (after idB which is at index 1)
+    expect(after.measures[2]!.id).not.toBe(idA);
+    expect(after.measures[2]!.id).not.toBe(idB);
+  });
+
+  it("paste with no selection and no index appends at the end", () => {
+    const score = createScore();
+    const measureId = score.measures[0]!.id;
+    useEditorStore.getState().setCurrentScore(score);
+    useEditorStore.getState().selectMeasure(measureId, false);
+    useEditorStore.getState().copySelectedMeasures();
+    useEditorStore.getState().clearSelection();
+    useEditorStore.getState().pasteMeasures();
+
+    expect(useEditorStore.getState().score!.measures).toHaveLength(2);
+  });
+});

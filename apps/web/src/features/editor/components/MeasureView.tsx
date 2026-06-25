@@ -32,9 +32,13 @@ type MeasureViewProps = {
   >;
   readonly dropEdge?: DropEdge;
   readonly isDragging?: boolean;
+  /** Whether this measure is part of the copy selection (EDIT-003). */
+  readonly isSelected?: boolean;
   readonly onToggle: (measureId: string, instrument: Instrument, position: number) => void;
   readonly onDuplicate: (measureId: string) => void;
   readonly onRemove: (measureId: string) => void;
+  /** Called when the measure title is clicked to select/deselect (EDIT-003). */
+  readonly onSelect?: (measureId: string, shiftKey: boolean) => void;
 };
 
 function MeasureViewComponent({
@@ -50,9 +54,11 @@ function MeasureViewComponent({
   dropTargetProps,
   dropEdge = "none",
   isDragging = false,
+  isSelected = false,
   onToggle,
   onDuplicate,
   onRemove,
+  onSelect,
 }: MeasureViewProps): React.JSX.Element {
   const inLoop = loopRole !== "none";
   const ref = React.useRef<HTMLElement>(null);
@@ -76,6 +82,8 @@ function MeasureViewComponent({
       className={cn(
         "relative rounded-lg border bg-white p-4 transition-colors",
         isActive ? "border-blue-500 ring-2 ring-blue-300" : "border-neutral-200",
+        // Copy selection (EDIT-003): green ring, layered under the blue active ring.
+        isSelected && !isActive && "ring-2 ring-emerald-400",
         // Loop region (PRACT-001): a violet left rail spans the looped measures,
         // distinct from the blue "playing" highlight and visible alongside it.
         inLoop && "border-l-4 border-l-violet-500",
@@ -98,7 +106,30 @@ function MeasureViewComponent({
       <header className="mb-3 flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           {dragHandle}
-          <h3 className="text-sm font-semibold text-neutral-700">Measure {index + 1}</h3>
+          <h3
+            className={cn(
+              "text-sm font-semibold text-neutral-700",
+              onSelect && "cursor-pointer select-none rounded px-1 -mx-1 hover:bg-neutral-100",
+              isSelected && "text-emerald-700",
+            )}
+            role={onSelect ? "button" : undefined}
+            tabIndex={onSelect ? 0 : undefined}
+            onClick={onSelect ? (e) => onSelect(measure.id, e.shiftKey) : undefined}
+            onKeyDown={
+              onSelect
+                ? (e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      onSelect(measure.id, e.shiftKey);
+                    }
+                  }
+                : undefined
+            }
+            aria-label={`Select measure ${index + 1}`}
+            aria-pressed={isSelected}
+          >
+            Measure {index + 1}
+          </h3>
           {loopRole === "start" || loopRole === "single" ? (
             <span className="rounded bg-violet-100 px-1.5 py-0.5 text-xs font-medium text-violet-700">
               Loop

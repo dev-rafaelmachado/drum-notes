@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import * as engine from "@drum-notes/notation-engine";
-import type { AudioReference, Instrument, Score } from "@drum-notes/notation-engine";
+import type { AudioReference, Instrument, Measure, Score } from "@drum-notes/notation-engine";
 
 import { loadScore as loadScoreFromDb, saveScore } from "../../project/services/score-repository";
 
@@ -29,6 +29,12 @@ type EditorState = {
   canUndo: boolean;
   canRedo: boolean;
 
+  /** Measures currently highlighted for copy (EDIT-003). */
+  selectedMeasureIds: ReadonlySet<string>;
+  /** Snapshot of measures ready to paste (EDIT-003). Session-only; not persisted. */
+  clipboard: readonly Measure[] | null;
+  canPaste: boolean;
+
   loadScore: (id: string) => Promise<void>;
   setCurrentScore: (score: Score) => void;
   reset: () => void;
@@ -45,11 +51,21 @@ type EditorState = {
   toggleNote: (measureId: string, instrument: Instrument, position: number) => void;
   attachAudio: (audio: AudioReference) => void;
   detachAudio: () => void;
+
+  /** Select a measure. Without shiftKey replaces the selection; with shiftKey extends to a range. */
+  selectMeasure: (measureId: string, shiftKey: boolean) => void;
+  clearSelection: () => void;
+  /** Copy selected measures (score order) to the clipboard. Not undoable. */
+  copySelectedMeasures: () => void;
+  /** Paste clipboard at `atIndex`; defaults to after the last selected measure (or append). */
+  pasteMeasures: (atIndex?: number) => void;
 };
 
 export const useEditorStore = create<EditorState>((set, get) => {
   // Tracks the last edit type to enable coalescing of continuous inputs.
   let lastEditType: string | null = null;
+  // Anchor for shift-click range selection (EDIT-003).
+  let selectionAnchorId: string | null = null;
 
   async function persist(score: Score): Promise<void> {
     set({ saveStatus: "saving" });
@@ -94,6 +110,11 @@ export const useEditorStore = create<EditorState>((set, get) => {
     set({ past: [], future: [], canUndo: false, canRedo: false });
   }
 
+  function clearSelectionState(): void {
+    selectionAnchorId = null;
+    set({ selectedMeasureIds: new Set<string>() });
+  }
+
   return {
     score: null,
     loadStatus: "idle",
@@ -104,9 +125,14 @@ export const useEditorStore = create<EditorState>((set, get) => {
     canUndo: false,
     canRedo: false,
 
+    selectedMeasureIds: new Set<string>(),
+    clipboard: null,
+    canPaste: false,
+
     async loadScore(id) {
       set({ loadStatus: "loading" });
       clearHistory();
+      clearSelectionState();
       try {
         const score = await loadScoreFromDb(id);
         if (score) {
@@ -121,12 +147,14 @@ export const useEditorStore = create<EditorState>((set, get) => {
 
     setCurrentScore(score) {
       clearHistory();
+      clearSelectionState();
       set({ score, loadStatus: "ready", saveStatus: "idle" });
     },
 
     reset() {
       clearHistory();
-      set({ score: null, loadStatus: "idle", saveStatus: "idle" });
+      clearSelectionState();
+      set({ score: null, loadStatus: "idle", saveStatus: "idle", clipboard: null, canPaste: false });
     },
 
     undo() {
@@ -175,5 +203,51 @@ export const useEditorStore = create<EditorState>((set, get) => {
       edit((score) => engine.toggleNote(score, measureId, instrument, position)),
     attachAudio: (audio) => edit((score) => engine.attachAudio(score, audio)),
     detachAudio: () => edit((score) => engine.detachAudio(score)),
+
+    selectMeasure(measureId, shiftKey) {
+      const { score } = get();
+      if (!score) return;
+      if (!shiftKey || selectionAnchorId === null) {
+        selectionAnchorId = measureId;
+        set({ selectedMeasureIds: new Set([measureId]) });
+        return;
+      }
+      const anchorIndex = score.measures.findIndex((m) => m.id === selectionAnchorId);
+      const clickIndex = score.measures.findIndex((m) => m.id === measureId);
+      if (anchorIndex === -1) {
+        selectionAnchorId = measureId;
+        set({ selectedMeasureIds: new Set([measureId]) });
+        return;
+      }
+      const from = Math.min(anchorIndex, clickIndex);
+      const to = Math.max(anchorIndex, clickIndex);
+      const range = score.measures.slice(from, to + 1).map((m) => m.id);
+      set({ selectedMeasureIds: new Set(range) });
+    },
+
+    clearSelection() {
+      clearSelectionState();
+    },
+
+    copySelectedMeasures() {
+      const { score, selectedMeasureIds } = get();
+      if (!score || selectedMeasureIds.size === 0) return;
+      const clipboard = score.measures.filter((m) => selectedMeasureIds.has(m.id));
+      set({ clipboard, canPaste: clipboard.length > 0 });
+    },
+
+    pasteMeasures(atIndex) {
+      const { clipboard, score, selectedMeasureIds } = get();
+      if (!clipboard || clipboard.length === 0 || !score) return;
+      let target = atIndex;
+      if (target === undefined) {
+        const lastSelectedIndex = score.measures.reduce(
+          (max, m, i) => (selectedMeasureIds.has(m.id) ? i : max),
+          -1,
+        );
+        target = lastSelectedIndex === -1 ? score.measures.length : lastSelectedIndex + 1;
+      }
+      edit((s) => engine.pasteMeasures(s, clipboard, target!));
+    },
   };
 });
