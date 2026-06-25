@@ -421,7 +421,10 @@ Low
 
 ### AUDIO-007 — Waveform Display + Loop Regions
 
-Status: Ideas
+Status: Delivered (SKI-22)
+
+Spec: [docs/specs/waveform-display/spec.md](../specs/waveform-display/spec.md)
+ADR: [docs/adr/013-waveform.md](../adr/013-waveform.md)
 
 Description:
 Display the reference track's waveform above the measures and let users
@@ -430,13 +433,14 @@ features that share the same audio visualization surface.
 
 Features:
 
-* **Waveform**: draw the audio waveform in a strip above the measure grid
-* Computed from the stored audio blob using Web Audio API AnalyserNode
-* Scroll-synced with the measures
-* Playhead position indicator on the waveform
+* **Waveform**: canvas strip in the audio panel showing the full audio timeline
+* Computed from the stored blob via `AudioContext.decodeAudioData`; held as
+  session state (not persisted)
+* Playhead position indicator follows the reference audio player position
+* Measure tick marks shown when a SyncMap is loaded
 * **Loop regions**: drag to select a region on the waveform
-* Region highlights loop start/end in the transport
-* Loops sync with PRACT-001 loop playback
+* Region highlights loop start/end; waveform overlay mirrors `playback-store.loop`
+* Loops sync with PRACT-001 loop playback via `playback-store.setLoop`
 
 Value:
 Waveform gives visual context for synchronization (see where beats fall).
