@@ -159,6 +159,30 @@ describe("playback store", () => {
     expect(playbackEngine.setLoop).toHaveBeenCalledWith(null);
   });
 
+  describe("setLoop (AUDIO-007)", () => {
+    it("sets a range directly and forwards it to the engine", () => {
+      usePlaybackStore.getState().setLoop({ start: 1, end: 3 });
+
+      expect(usePlaybackStore.getState().loop).toEqual({ start: 1, end: 3 });
+      expect(playbackEngine.setLoop).toHaveBeenCalledWith({ start: 1, end: 3 });
+    });
+
+    it("overwrites an existing loop range", () => {
+      usePlaybackStore.setState({ loop: { start: 0, end: 2 } });
+      usePlaybackStore.getState().setLoop({ start: 3, end: 5 });
+
+      expect(usePlaybackStore.getState().loop).toEqual({ start: 3, end: 5 });
+    });
+
+    it("clears the loop when called with null", () => {
+      usePlaybackStore.setState({ loop: { start: 1, end: 2 } });
+      usePlaybackStore.getState().setLoop(null);
+
+      expect(usePlaybackStore.getState().loop).toBeNull();
+      expect(playbackEngine.setLoop).toHaveBeenCalledWith(null);
+    });
+  });
+
   it("re-applies the session loop and speed when starting playback", async () => {
     usePlaybackStore.setState({ speed: 0.75, loop: { start: 1, end: 2 } });
 

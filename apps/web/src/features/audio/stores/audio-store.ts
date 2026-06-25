@@ -12,15 +12,20 @@ import {
   loadAudioBlob,
   saveAudioBlob,
 } from "../services/audio-repository";
+import { generateWaveform } from "../services/waveform-service";
 
 /**
  * Orchestrates the project's reference track: upload, persistence and transport.
  * Business rules (what a valid AudioReference is, attaching it to the Score)
  * live in the domain and the editor store; this store wires those to the
  * IndexedDB blob storage and the Tone.js player (see docs/specs/audio-upload).
+ *
+ * Also holds waveform amplitude data (AUDIO-007, see docs/adr/013-waveform.md):
+ * a derived Float32Array of [min,max] pairs computed on demand from the blob.
  */
 
 export type AudioStatus = "empty" | "loading" | "ready" | "error";
+export type WaveformStatus = "idle" | "generating" | "ready" | "error";
 
 const DEFAULT_VOLUME = 0.8;
 
@@ -32,6 +37,8 @@ type AudioState = {
   position: number;
   duration: number;
   volume: number; // linear 0..1
+  waveformData: Float32Array | null;
+  waveformStatus: WaveformStatus;
 
   /** Load (or clear) the player to match the score's current audio reference. */
   syncWithScore: (reference: AudioReference | null) => Promise<void>;
@@ -42,6 +49,8 @@ type AudioState = {
   stop: () => void;
   seek: (seconds: number) => void;
   setVolume: (level: number) => void;
+  /** Decode the stored blob and compute the waveform peak array (AUDIO-007). */
+  generateWaveformData: (blob: Blob) => Promise<void>;
 };
 
 /** Resolve a usable audio MIME type, inferring from the extension when the browser left it blank. */
@@ -74,6 +83,8 @@ export const useAudioStore = create<AudioState>((set, get) => {
       isPlaying: false,
       position: 0,
       duration: 0,
+      waveformData: null,
+      waveformStatus: "idle",
     });
   }
 
@@ -85,6 +96,8 @@ export const useAudioStore = create<AudioState>((set, get) => {
     position: 0,
     duration: 0,
     volume: DEFAULT_VOLUME,
+    waveformData: null,
+    waveformStatus: "idle",
 
     async syncWithScore(reference) {
       if (reference?.id === get().reference?.id) {
@@ -178,6 +191,16 @@ export const useAudioStore = create<AudioState>((set, get) => {
       const clamped = Math.max(0, Math.min(level, 1));
       audioPlayer.setVolume(clamped);
       set({ volume: clamped });
+    },
+
+    async generateWaveformData(blob) {
+      set({ waveformStatus: "generating", waveformData: null });
+      try {
+        const data = await generateWaveform(blob);
+        set({ waveformData: data, waveformStatus: "ready" });
+      } catch {
+        set({ waveformStatus: "error" });
+      }
     },
   };
 });

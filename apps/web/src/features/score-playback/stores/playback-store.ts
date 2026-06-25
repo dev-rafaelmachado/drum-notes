@@ -36,6 +36,8 @@ type PlaybackState = {
   setSpeed: (rate: number) => void;
   /** Toggle a measure into the loop range (select / extend / restart / clear). */
   toggleLoopMeasure: (measureIndex: number) => void;
+  /** Directly set (or clear) the loop range — used by the waveform drag (AUDIO-007). */
+  setLoop: (range: LoopRange | null) => void;
   clearLoop: () => void;
 };
 
@@ -113,6 +115,11 @@ export const usePlaybackStore = create<PlaybackState>((set, get) => {
       const loop = nextLoop(get().loop, measureIndex);
       set({ loop });
       playbackEngine.setLoop(loop);
+    },
+
+    setLoop(range) {
+      set({ loop: range });
+      playbackEngine.setLoop(range);
     },
 
     clearLoop() {
