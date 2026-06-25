@@ -107,7 +107,7 @@ export function ScoreEditor({ scoreId }: { scoreId: string }): React.JSX.Element
         onBpmChange={setBpm}
         onAddMeasure={addMeasure}
         onCopy={copySelectedMeasures}
-        onPaste={pasteMeasures}
+        onPaste={() => pasteMeasures()}
       />
       <div className="sticky top-24 z-5 mx-auto max-w-5xl px-6 pt-4">
         <AudioPanel audio={score.audio ?? null} />

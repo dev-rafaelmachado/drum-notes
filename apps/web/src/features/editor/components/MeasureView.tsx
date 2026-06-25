@@ -112,8 +112,21 @@ function MeasureViewComponent({
               onSelect && "cursor-pointer select-none rounded px-1 -mx-1 hover:bg-neutral-100",
               isSelected && "text-emerald-700",
             )}
+            role={onSelect ? "button" : undefined}
+            tabIndex={onSelect ? 0 : undefined}
             onClick={onSelect ? (e) => onSelect(measure.id, e.shiftKey) : undefined}
+            onKeyDown={
+              onSelect
+                ? (e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      onSelect(measure.id, e.shiftKey);
+                    }
+                  }
+                : undefined
+            }
             aria-label={`Select measure ${index + 1}`}
+            aria-pressed={isSelected}
           >
             Measure {index + 1}
           </h3>
