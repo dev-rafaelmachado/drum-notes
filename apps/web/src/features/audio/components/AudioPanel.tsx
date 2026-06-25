@@ -5,10 +5,12 @@ import { Music, Trash2 } from "lucide-react";
 import type { AudioReference } from "@drum-notes/notation-engine";
 
 import { Button } from "@/components/ui/button";
+import { loadAudioBlob } from "../services/audio-repository";
 import { useAudioStore } from "../stores/audio-store";
 import { AudioUploader } from "./AudioUploader";
 import { TransportControls } from "./TransportControls";
 import { VolumeControl } from "./VolumeControl";
+import { WaveformTrack } from "./WaveformTrack";
 
 /**
  * The project's reference-track panel. Hydrates the player from the score's
@@ -36,12 +38,22 @@ export function AudioPanel({
   const stop = useAudioStore((state) => state.stop);
   const seek = useAudioStore((state) => state.seek);
   const setVolume = useAudioStore((state) => state.setVolume);
+  const generateWaveformData = useAudioStore((state) => state.generateWaveformData);
 
   React.useEffect(() => {
     // `audio` keeps a stable identity across unrelated edits, so this only
     // re-runs when the attached track actually changes.
     void syncWithScore(audio);
   }, [audio, syncWithScore]);
+
+  // Generate waveform data once the player is ready (AUDIO-007).
+  React.useEffect(() => {
+    if (status !== "ready" || !reference) return;
+    void (async () => {
+      const stored = await loadAudioBlob(reference.id);
+      if (stored) void generateWaveformData(stored.blob);
+    })();
+  }, [status, reference, generateWaveformData]);
 
   const hasTrack = status === "ready" && reference !== null;
 
@@ -97,6 +109,12 @@ export function AudioPanel({
           </>
         )}
       </div>
+
+      {hasTrack ? (
+        <div className="mt-3">
+          <WaveformTrack />
+        </div>
+      ) : null}
 
       {errorMessage ? (
         <p role="alert" className="mt-2 text-xs text-red-600">
