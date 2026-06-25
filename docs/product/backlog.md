@@ -171,7 +171,7 @@ Medium
 
 ### EDIT-001 — Undo / Redo
 
-Status: Ideas
+Status: Specified — see [undo-redo spec](../specs/undo-redo/spec.md)
 
 Description:
 Allow users to undo and redo any editing action (toggle note, add/remove

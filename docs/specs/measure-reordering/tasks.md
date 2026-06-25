@@ -30,10 +30,10 @@ testable and carries a one-line acceptance note. Never start from the UI.
 
 ## Undo / Redo (depends on EDIT-001)
 
-- [ ] Confirm a reorder is a single, atomic, invertible entry in the EDIT-001 history — *undo restores the previous order, redo re-applies the move; no bespoke undo stack is added here. **Blocked on EDIT-001 (not yet implemented).** `moveMeasure` already flows through the shared `edit()` path, so it will be recorded like any other edit once history lands.*
+- [x] Confirm a reorder is a single, atomic, invertible entry in the EDIT-001 history — *undo restores the previous order, redo re-applies the move; no bespoke undo stack is added here. `moveMeasure` flows through the shared `edit()` path and is recorded like any other edit. Verified by `editor-store.test.ts` ("undoes a measure reorder and restores previous order"). Completed with EDIT-001 landing.*
 
 ## Validation
 
 - [x] Verify the critical flow — *domain + store unit tests cover the reorder math and the autosaving store action; drag/keyboard interaction verified via type-check + build (pointer drag is not reliable under jsdom).*
-- [x] Verify [acceptance criteria](spec.md#acceptance-criteria) — *type-check, lint, all 120 tests, and production build green (AC 5 completes once EDIT-001 lands).*
+- [x] Verify [acceptance criteria](spec.md#acceptance-criteria) — *type-check, lint, all tests, and production build green. AC 5 (reorder can be undone) completed with EDIT-001.*
 - [x] Sync docs — *[backlog.md](../../product/backlog.md) status set to Specified. domain.md has no operations catalogue to extend (it describes the model, which is unchanged — measures stay an ordered, id-keyed list). No ADR required (see [spec](spec.md#dependencies--decisions)).*
