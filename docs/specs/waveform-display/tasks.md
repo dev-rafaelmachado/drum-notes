@@ -9,7 +9,7 @@ app-layer). Each task is independently testable.
 
 ## Waveform Service (`apps/web/src/features/audio/services`)
 
-- [ ] `waveform-service.ts`:
+- [x] `waveform-service.ts`:
   - `WAVEFORM_BUCKETS = 2000` constant
   - `generateWaveform(blob: Blob, buckets?: number): Promise<Float32Array>` —
     decodes via `AudioContext.decodeAudioData`, reads channel 0, downsamples to
@@ -22,33 +22,33 @@ app-layer). Each task is independently testable.
 
 ## State (`apps/web/src/features/audio/stores`)
 
-- [ ] `audio-store.ts` — add `waveformData: Float32Array | null` (default
+- [x] `audio-store.ts` — add `waveformData: Float32Array | null` (default
   `null`) and `waveformStatus: "idle" | "generating" | "ready" | "error"`
   (default `"idle"`).
-- [ ] Add `generateWaveform(blob: Blob): Promise<void>` action — calls the
+- [x] Add `generateWaveform(blob: Blob): Promise<void>` action — calls the
   service and sets `waveformData` / `waveformStatus`; any previous data is
   cleared before generation starts.
-- [ ] Clear `waveformData` and reset `waveformStatus` to `"idle"` on
+- [x] Clear `waveformData` and reset `waveformStatus` to `"idle"` on
   `remove()`.
 
 ## State (`apps/web/src/features/score-playback/stores`)
 
-- [ ] `playback-store.ts` — add `setLoop(range: LoopRange | null)` action: sets
+- [x] `playback-store.ts` — add `setLoop(range: LoopRange | null)` action: sets
   `loop` and forwards to `playbackEngine.setLoop`. This is the direct range
   setter intended for the waveform drag (the existing `toggleLoopMeasure`
   handles the single-measure-click UX).
 
 ## Tests
 
-- [ ] `waveform-service.test.ts` — unit tests for `secondsToPixel` and
+- [x] `waveform-service.test.ts` — unit tests for `secondsToPixel` and
   `pixelToSeconds` (pure math, no mocking needed). Covers zero duration, zero
   width, midpoint, clamping at boundaries.
-- [ ] `playback-store.test.ts` — add `setLoop` tests: sets store state,
+- [x] `playback-store.test.ts` — add `setLoop` tests: sets store state,
   forwards range to engine, clears loop when called with null.
 
 ## Components (`apps/web/src/features/audio/components` + `hooks`)
 
-- [ ] `WaveformCanvas.tsx` — stateless canvas renderer. Props:
+- [x] `WaveformCanvas.tsx` — stateless canvas renderer. Props:
   `waveformData: Float32Array`, `duration: number`, `position: number`,
   `loopStart: number | null`, `loopEnd: number | null` (seconds),
   `measureTicks: number[]`,
@@ -58,11 +58,11 @@ app-layer). Each task is independently testable.
   translucent), playhead line (blue), measure ticks (neutral-300), live drag
   overlay.
 
-- [ ] `useWaveformInteraction.ts` hook — manages mouse drag state on a canvas
+- [x] `useWaveformInteraction.ts` hook — manages mouse drag state on a canvas
   ref; fires `onDragSelect(t1, t2)` on mouse-up if horizontal movement ≥ 4px;
   fires `onClear()` on click (no drag). Returns `{ dragProps, dragOverlay }`.
 
-- [ ] `WaveformTrack.tsx` — connected container. Reads: `audio-store`
+- [x] `WaveformTrack.tsx` — connected container. Reads: `audio-store`
   (`waveformData`, `duration`, `position`, `waveformStatus`),
   `playback-store` (`loop`, `setLoop`, `clearLoop`), `sync-store` (`syncMap`),
   `editor-store` (`score`). Derives `loopStart`/`loopEnd` in seconds from
@@ -72,13 +72,13 @@ app-layer). Each task is independently testable.
 
 ## Integration
 
-- [ ] `AudioPanel.tsx` — when `hasTrack`, render `<WaveformTrack />` below the
+- [x] `AudioPanel.tsx` — when `hasTrack`, render `<WaveformTrack />` below the
   transport controls row as a full-width block. Trigger
   `audioStore.generateWaveform(blob)` via a `useEffect` when
   `status === "ready"` (requires loading the blob from the repository).
 
 ## Validation
 
-- [ ] Run `pnpm typecheck` and `pnpm lint` in `apps/web`; fix all errors.
-- [ ] Run `pnpm test` in `apps/web`; all tests green.
-- [ ] Update [ADR-013](../../adr/013-waveform.md), backlog, and roadmap.
+- [x] Run `pnpm typecheck` and `pnpm lint` in `apps/web`; fix all errors.
+- [x] Run `pnpm test` in `apps/web`; all tests green.
+- [x] Update [ADR-013](../../adr/013-waveform.md), backlog, and roadmap.
