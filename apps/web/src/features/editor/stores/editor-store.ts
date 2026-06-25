@@ -8,7 +8,13 @@ import { loadScore as loadScoreFromDb, saveScore } from "../../project/services/
  * Editor state orchestration. The store holds the current Score and exposes
  * actions; all business rules live in the domain (@drum-notes/notation-engine).
  * Every meaningful edit autosaves to IndexedDB (see docs/architecture/storage.md).
+ *
+ * History (EDIT-001): each `edit()` call pushes a snapshot of the pre-edit Score
+ * onto `past`. Undo/redo swap between `past` and `future`. History is session-only
+ * (in-memory); autosave never clears the stacks.
  */
+
+const MAX_HISTORY = 100;
 
 export type SaveStatus = "idle" | "saving" | "saved" | "error";
 export type LoadStatus = "idle" | "loading" | "ready" | "not-found" | "error";
@@ -18,9 +24,17 @@ type EditorState = {
   loadStatus: LoadStatus;
   saveStatus: SaveStatus;
 
+  past: readonly Score[];
+  future: readonly Score[];
+  canUndo: boolean;
+  canRedo: boolean;
+
   loadScore: (id: string) => Promise<void>;
   setCurrentScore: (score: Score) => void;
   reset: () => void;
+
+  undo: () => void;
+  redo: () => void;
 
   setTitle: (title: string) => void;
   setBpm: (bpm: number) => void;
@@ -34,6 +48,9 @@ type EditorState = {
 };
 
 export const useEditorStore = create<EditorState>((set, get) => {
+  // Tracks the last edit type to enable coalescing of continuous inputs.
+  let lastEditType: string | null = null;
+
   async function persist(score: Score): Promise<void> {
     set({ saveStatus: "saving" });
     try {
@@ -44,15 +61,37 @@ export const useEditorStore = create<EditorState>((set, get) => {
     }
   }
 
-  /** Apply a pure domain operation to the current score, then autosave. */
-  function edit(operation: (score: Score) => Score): void {
-    const current = get().score;
-    if (!current) {
-      return;
-    }
-    const next = operation(current);
-    set({ score: next });
+  /**
+   * Apply a pure domain operation to the current score, push a history entry,
+   * and autosave. Pass `editType` for continuous inputs (setBpm, setTitle) to
+   * coalesce consecutive edits of the same type into a single undo step.
+   */
+  function edit(operation: (score: Score) => Score, editType?: string): void {
+    const { score, past } = get();
+    if (!score) return;
+
+    const next = operation(score);
+
+    const shouldCoalesce = editType !== undefined && editType === lastEditType;
+    const newPast = shouldCoalesce
+      ? past
+      : ([...past.slice(-(MAX_HISTORY - 1)), score] as readonly Score[]);
+
+    lastEditType = editType ?? null;
+
+    set({
+      score: next,
+      past: newPast,
+      future: [],
+      canUndo: newPast.length > 0,
+      canRedo: false,
+    });
     void persist(next);
+  }
+
+  function clearHistory(): void {
+    lastEditType = null;
+    set({ past: [], future: [], canUndo: false, canRedo: false });
   }
 
   return {
@@ -60,8 +99,14 @@ export const useEditorStore = create<EditorState>((set, get) => {
     loadStatus: "idle",
     saveStatus: "idle",
 
+    past: [],
+    future: [],
+    canUndo: false,
+    canRedo: false,
+
     async loadScore(id) {
       set({ loadStatus: "loading" });
+      clearHistory();
       try {
         const score = await loadScoreFromDb(id);
         if (score) {
@@ -75,15 +120,51 @@ export const useEditorStore = create<EditorState>((set, get) => {
     },
 
     setCurrentScore(score) {
+      clearHistory();
       set({ score, loadStatus: "ready", saveStatus: "idle" });
     },
 
     reset() {
+      clearHistory();
       set({ score: null, loadStatus: "idle", saveStatus: "idle" });
     },
 
-    setTitle: (title) => edit((score) => engine.setTitle(score, title)),
-    setBpm: (bpm) => edit((score) => engine.setBpm(score, bpm)),
+    undo() {
+      const { score, past, future } = get();
+      if (!score || past.length === 0) return;
+      const previous = past[past.length - 1]!;
+      const newPast = past.slice(0, -1) as readonly Score[];
+      const newFuture = [score, ...future] as readonly Score[];
+      lastEditType = null;
+      set({
+        score: previous,
+        past: newPast,
+        future: newFuture,
+        canUndo: newPast.length > 0,
+        canRedo: true,
+      });
+      void persist(previous);
+    },
+
+    redo() {
+      const { score, past, future } = get();
+      if (!score || future.length === 0) return;
+      const next = future[0]!;
+      const newFuture = future.slice(1) as readonly Score[];
+      const newPast = [...past, score] as readonly Score[];
+      lastEditType = null;
+      set({
+        score: next,
+        past: newPast,
+        future: newFuture,
+        canUndo: true,
+        canRedo: newFuture.length > 0,
+      });
+      void persist(next);
+    },
+
+    setTitle: (title) => edit((score) => engine.setTitle(score, title), "setTitle"),
+    setBpm: (bpm) => edit((score) => engine.setBpm(score, bpm), "setBpm"),
     addMeasure: () => edit((score) => engine.addMeasure(score)),
     removeMeasure: (measureId) => edit((score) => engine.removeMeasure(score, measureId)),
     moveMeasure: (measureId, toIndex) =>
